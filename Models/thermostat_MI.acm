@@ -1,0 +1,56 @@
+// ===============================================================
+// Title  : thermostat_MI.acm
+// Author : Arend Aerts
+// Project: Model-Based testing tool for hybrid systems in Acumen
+// Date   : 12-03-2015
+// Description: Hybrid model and implementation thermostat 
+// ===============================================================
+
+
+model Main(simulator) = 
+initially
+  a = create thermostat_model(),
+  b = create thermostat_implementation()
+always
+//SIM variables [BEGIN]
+simulator.timeStep+=0.1,simulator.endTime+=4.0
+//SIM variables [END]
+
+
+model thermostat_model() =
+initially
+//SYSTEM variables [BEGIN]
+t=20,t'=0.0,mode=1,tminmax=0.0
+//SYSTEM variables [END]
+always
+  match mode with [
+  1 ->
+    if t <= 70 then
+      mode+ = 2
+    else   
+      t' = -t 
+  | 2 ->
+    if t >= 80 then
+      mode+ = 1
+    else
+      t' = -t + 100 
+  ]
+
+model thermostat_implementation() =
+initially
+//SYSTEM variables [BEGIN]
+t=22.613,t'=0.0,mode=1, tminmax=0.0
+//SYSTEM variables [END]
+always
+  match mode with [
+  1 ->
+    if t <= 65 then
+      mode+ = 2
+    else   
+      t' = -t - 5
+  | 2 ->
+    if t >= 75 then
+      mode+ = 1
+    else
+      t' = -t + 95 
+  ]

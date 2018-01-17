@@ -1,0 +1,32 @@
+model Main(simulator) =
+initially 
+  a = create Ball_Model(),
+  b = create Ball_Implementation()
+always
+//SIM variables [BEGIN]
+simulator.timeStep+=0.03,simulator.endTime+=5.0
+//SIM variables [END]
+
+model Ball_Model() =
+initially 
+//SYSTEM variables [BEGIN]
+x1=5,x1'=0,x2=0,x2'=-9.8
+//SYSTEM variables [END]
+always
+ if x1 <= 0 && x2 <= 0 then 
+   x2 += -0.75*x2
+ noelse,
+ x2' = -9.8,
+ x1' = x2
+
+model Ball_Implementation() =
+initially 
+//SYSTEM variables [BEGIN]
+x1=6.951,x1'=0,x2=-0.98,x2'=-9.8
+//SYSTEM variables [END]
+always
+ if x1 <= 2 && x2 <= 0 then 
+   x2 += -0.75*x2
+ noelse,
+ x2' = -9.8,
+ x1' = x2
