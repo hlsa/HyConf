@@ -21,10 +21,17 @@ testcase = handles.testcase;
 model_path = handles.implementation_path;
 acumen_path = handles.acumen_path;
 
+% Temporary fixes
+temporary_path = pwd;
+cd('Acumen')
+code = strcat('start /min java -jar acumen-14.12.01.jar listen "..\Models\thermostat_MI2.acm" "5000" && exit');
+[status,results] = dos(code);
+cd(temporary_path)
 
-% Start server socket connection
-temp_path = sprintf('%s %s %s%s%s','start /min java -jar',acumen_path,'listen "',model_path,'" "5000" && exit');
-[status,results] = dos(temp_path);
+% 
+% % Start server socket connection
+% temp_path = sprintf('%s %s %s%s%s','start java -jar',acumen_path,'listen "',model_path,'" "5000" && exit')
+% [status,results] = dos(temp_path);
 
 
 % Iniate + execute socket connection Acumen 

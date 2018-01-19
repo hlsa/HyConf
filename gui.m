@@ -53,14 +53,14 @@ function gui_OpeningFcn(hObject, eventdata, handles, varargin)
 % varargin   command line arguments to gui (see VARARGIN)
 
 % Define workspace
-cd('PATH TO THE TOOL FOLDER');
+cd('C:\Users\s132652\Google Drive\TUe\2017-2018\Internship\GIT\cps-conf-tool');
 
 % Define location Acumen .jar file (runfile)
 % Note: tooling only tested with acumen-14.12.01.jar release!
-handles.acumen_path = 'PATH TO ACUMEN JAR';
+handles.acumen_path = 'C:\Users\s132652\Google Drive\TUe\2017-2018\Internship\GIT\cps-conf-tool\Acumen\acumen-14.12.01.jar';
 
 % Define location for CORA installation folder
-handles.cora_path = 'PATH TO CORA FOLDER';
+handles.cora_path = 'C:\Users\s132652\Google Drive\TUe\2017-2018\Internship\GIT\cps-conf-tool\CORA';
 
 
 % INIT GUI structure
