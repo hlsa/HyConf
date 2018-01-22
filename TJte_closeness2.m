@@ -18,6 +18,7 @@
 
 testcase = handles.testcase;
 acumen = handles.acumen;
+tooling_mode = handles.tooling_mode;
 TJte_closeness_mode = handles.tooling_mode;
 
 contents1=cellstr(get(handles.popupmenu25,'String'));
@@ -29,28 +30,40 @@ tmp3=cellstr(get(handles.edit12,'String'));
 tmp4=cellstr(get(handles.edit13,'String'));
 conformance.epsilon = str2double(char(tmp3)) + str2double(char(tmp4));
 
+model = handles.matlab.model;
+implementation = handles.matlab.implementation;
 
 for m=1:1:max(size(conformance.var))  
 
-    % Load implementation and model data
-    if acumen.instances > 1
-        X2 = acumen.time;
-        index=find(ismember(acumen.var,conformance.var(1,m)));
-        Y2 = acumen.data2(index,:);
-    else
-        X2 = acumen.time;
-        index=find(ismember(acumen.var,conformance.var(1,m)));
-        Y2 = acumen.data1(index,:);
-    end
+    if tooling_mode == 1 || tooling_mode == 2
+        % Load implementation and model data
+        if acumen.instances > 1
+            X2 = acumen.time;
+            index=find(ismember(acumen.var,conformance.var(1,m)));
+            Y2 = acumen.data2(index,:);
+        else
+            X2 = acumen.time;
+            index=find(ismember(acumen.var,conformance.var(1,m)));
+            Y2 = acumen.data1(index,:);
+        end
 
-    if TJte_closeness_mode == 2
-        X1 = acumen.time;
-        index=find(ismember(acumen.var,conformance.var(1,m)));
-        Y1 = acumen.data1(index,:);
-    elseif TJte_closeness_mode == 1
-        X1 = testcase.time;
-        index=find(ismember(testcase.var,conformance.var(1,m)));
-        Y1 = testcase.data(index,:);
+        if TJte_closeness_mode == 2
+            X1 = acumen.time;
+            index=find(ismember(acumen.var,conformance.var(1,m)));
+            Y1 = acumen.data1(index,:);
+        elseif TJte_closeness_mode == 1
+            X1 = testcase.time;
+            index=find(ismember(testcase.var,conformance.var(1,m)));
+            Y1 = testcase.data(index,:);
+        end
+    elseif tooling_mode == 3
+        index_model=find(ismember(model.variables,conformance.var(1,m)));
+        X1 = model.time;
+        Y1 = model.data(index_model,:);
+        
+        index_model=find(ismember(implementation.variables,conformance.var(1,m)));
+        X2 = implementation.time;
+        Y2 = implementation.data(index_model,:);
     end
 
 

@@ -22,7 +22,7 @@ function varargout = gui(varargin)
 
 % Edit the above text to modify the response to readme gui
 
-% Last Modified by GUIDE v2.5 22-Jan-2018 13:20:39
+% Last Modified by GUIDE v2.5 22-Jan-2018 14:28:02
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -80,7 +80,7 @@ set(handles.pushbutton13,'Enable','off');
 set(handles.start_analysis,'Enable','off');
 set(handles.pushbutton14,'Enable','off');
 set(handles.pushbutton15,'Enable','off');
-
+set(handles.pushbutton16,'Enable','off');
 
 % INIT data structure
 handles.model_path = '';
@@ -95,6 +95,10 @@ handles.acumen.timestep = 0;
 handles.acumen.endtime = 0;
 handles.acumen.var = {};
 handles.acumen.instances = 0;
+
+% handles.matlab.model.time = [];
+
+% handles.matlab.implementation.time = [];
 
 handles.testcase.time = [];
 handles.testcase.inputvalue = [];
@@ -195,9 +199,30 @@ if strcmp(get(handles.pushbutton13,'Enable'),'off') && handles.useraction1 == 1 
 
         % Update menu structure
         set(handles.popupmenu9,'Enable','on');   
+    
+    elseif handles.tooling_mode == 3
+        disp('Conformance testing Matlab model and implementation');
+        run('TJte_closeness2.m');
+        set(handles.popupmenu9,'Enable','on'); 
+        
+        if conformance.result == 1
+            disp(strcat(datestr(now),'   [MATLAB] Conformance check:','   SUCCESFULL'));
+            set(handles.text11,'Visible','off');
+            set(handles.text13,'Visible','on');
+            cla(handles.axes1)
+            drawnow;
+        else
+            disp(strcat(datestr(now),'   [MATLAB] Conformance check:','   FAILED'));
+            set(handles.text11,'Visible','on');
+            set(handles.text13,'Visible','off');
+            drawnow;
+        end
+        
     else
         % Delete graph
         cla(handles.axes1);
+
+        
     end
 end
 
@@ -254,6 +279,7 @@ drawnow;
 % Update menu structure
 set(handles.popupmenu_toolingmode,'Enable','on');
 set(handles.pushbutton14,'Enable','on');
+set(handles.pushbutton16,'Enable','on');
 if ~isempty(handles.implementation_path) && ~isempty(handles.model_path) 
     set(handles.pushbutton12,'Enable','on');   
 end
@@ -281,6 +307,7 @@ end
 run('ACMfile_import2.m');
 
 % Upload variables to plot and comformance selection
+handles.acumen.var
 set(handles.plotvar,'String',char(handles.acumen.var'));
 set(handles.popupmenu25,'String',char(handles.acumen.var'));
 
@@ -314,13 +341,19 @@ function plotvar_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns plotvar contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from plotvar
 
+% Determine tooling mode
+tooling_mode = get(handles.popupmenu_toolingmode,'Value');
 
 % Plot results
 cla(handles.axes1);
 axes(handles.axes1);
-run('acumen_plot2.m');
+if tooling_mode == 1 || tooling_mode == 2
+    run('acumen_plot2.m');
+elseif tooling_mode == 3
+    run('matlab_plot.m');
+end
 
-% STATUS UPDATE GUI 
+% STATUS UPDATE GUI
 temp=get(handles.statup,'String');
 set(handles.statup,'String',strvcat(strcat(datestr(now),'   [MATLAB] PLOT:',selected_var),char(temp))); 
 drawnow;
@@ -343,11 +376,16 @@ function selectoutput_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns temp contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from temp
 
+tooling_mode = get(handles.popupmenu_toolingmode,'Value');
 
 % Plot results
 cla(handles.axes1);
 axes(handles.axes1);
-run('acumen_plot2.m');
+if tooling_mode == 1 || tooling_mode == 2
+    run('acumen_plot2.m');
+elseif tooling_mode == 3
+    run('matlab_plot.m');
+end
 
 
 % STATUS UPDATE GUI 
@@ -764,7 +802,7 @@ set(handles.pushbutton12,'Enable','off');
 set(handles.pushbutton13,'Enable','off');
 set(handles.pushbutton14,'Enable','off');
 set(handles.start_analysis,'Enable','off'); 
-
+set(handles.pushbutton16,'Enable','off');
 
 % --- Executes on selection change in popupmenu25.
 function popupmenu25_Callback(hObject, eventdata, handles)
@@ -807,4 +845,47 @@ function edit13_CreateFcn(hObject, eventdata, handles)
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in pushbutton16.
+function pushbutton16_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton16 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+tooling_mode = get(handles.popupmenu_toolingmode,'Value');
+
+if ~isempty(handles.model_path) && tooling_mode == 3
+    temp=get(handles.statup,'String');
+    set(handles.statup,'String',strvcat(strcat(datestr(now),'   [MATLAB] Loading data from model and implementation'),char(temp))); 
+    drawnow;
+
+    % Run test case generation file
+    run(handles.model_path);
+    
+%     handles.matlab.model = model;
+%     handles.matlab.implementation = implementation;
+    
+    % Update menu structure
+    set(handles.plotvar,'String',char(handles.matlab.model.variables));
+    set(handles.popupmenu25,'String',char(handles.matlab.model.variables));
+    
+    set(handles.plotvar,'Enable','on');
+    set(handles.selectoutput,'Enable','on');
+    set(handles.popupmenu25,'Enable','on');
+    set(handles.edit11,'Enable','on');
+    set(handles.edit12,'Enable','on');
+    set(handles.edit13,'Enable','on');
+    set(handles.start_analysis,'Enable','on');
+    
+    % Plot results
+    cla(handles.axes1);
+    axes(handles.axes1);
+    run('matlab_plot.m');
+
+    % Update menu structure
+    set(handles.pushbutton16,'Enable','off');
+    
+    % Update handles structure
+    guidata(hObject, handles);
 end
