@@ -43,11 +43,11 @@ for m=1:1:max(size(conformance.var))
         Y2 = acumen.data1(index,:);
     end
 
-    if TJte_closeness_mode == 0
+    if TJte_closeness_mode == 2
         X1 = acumen.time;
         index=find(ismember(acumen.var,conformance.var(1,m)));
         Y1 = acumen.data1(index,:);
-    else
+    elseif TJte_closeness_mode == 1
         X1 = testcase.time;
         index=find(ismember(testcase.var,conformance.var(1,m)));
         Y1 = testcase.data(index,:);
@@ -147,9 +147,9 @@ for m=1:1:max(size(conformance.var))
             grid on;
             xlabel('Time');
             ylabel('Value');
-            if TJte_closeness_mode == 0
+            if TJte_closeness_mode == 2
                 legend('Model [Acumen]','Implementation [Acumen]','((T,J,(tau,epsilon))-closeness)');    
-            else
+            elseif TJte_closeness_mode == 1
                 legend('Model [Matlab]','Implementation [Acumen]','((T,J,(tau,epsilon))-closeness)');
             end
             title(strcat(conformance.var(1,m),'    (Iteration 1)'));
@@ -172,9 +172,9 @@ for m=1:1:max(size(conformance.var))
             grid on;
             xlabel('Time');
             ylabel('Value');
-            if TJte_closeness_mode == 0
+            if TJte_closeness_mode == 2
                 legend('Model [Acumen]','Implementation [Acumen]','((T,J,(tau,epsilon))-closeness)');    
-            else
+            elseif TJte_closeness_mode == 1
                 legend('Model [Matlab]','Implementation [Acumen]','((T,J,(tau,epsilon))-closeness)');
             end
 

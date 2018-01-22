@@ -13,7 +13,7 @@ initially
   b = create thermostat_implementation()
 always
 //SIM variables [BEGIN]
-simulator.timeStep+=0.01,simulator.endTime+=10.0
+simulator.timeStep+=0.01,simulator.endTime+=5.0
 //SIM variables [END]
 
 

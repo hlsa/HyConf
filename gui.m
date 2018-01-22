@@ -22,7 +22,7 @@ function varargout = gui(varargin)
 
 % Edit the above text to modify the response to readme gui
 
-% Last Modified by GUIDE v2.5 22-Jan-2018 10:29:06
+% Last Modified by GUIDE v2.5 22-Jan-2018 13:20:39
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -67,7 +67,7 @@ handles.cora_path = 'C:\Users\s132652\Google Drive\TUe\2017-2018\Internship\GIT\
 handles.useraction1 = 0;
 handles.useraction2 = 0;
 set(handles.popupmenu25,'Enable','off');
-set(handles.popupmenu24,'Enable','off');
+set(handles.popupmenu_toolingmode,'Enable','off');
 set(handles.plotvar,'Enable','off');
 set(handles.selectoutput,'Enable','off');
 set(handles.popupmenu9,'Enable','off');
@@ -126,15 +126,7 @@ image(100,100,imread('logo_hu.jpg'));
 axis(handles.logo_hu, 'off')
 
 % Determine tooling mode
-contents=cellstr(get(handles.popupmenu24,'String'));
-tmp = contents{get(handles.popupmenu24,'Value')};
-
-if ~isempty(strfind(tmp,'Matlab'))
-    handles.tooling_mode = 1;
-else
-    handles.tooling_mode = 0;
-end
-
+tooling_mode = get(handles.popupmenu_toolingmode,'Value');
 
 % Choose default command line output for gui
 handles.output = hObject;
@@ -171,16 +163,9 @@ cla(handles.axes1);
 if strcmp(get(handles.pushbutton13,'Enable'),'off') && handles.useraction1 == 1 && handles.useraction2 == 1
 
     % Determine tooling mode
-    contents=cellstr(get(handles.popupmenu24,'String'));
-    tmp = contents{get(handles.popupmenu24,'Value')};
+    handles.tooling_mode = get(handles.popupmenu_toolingmode,'Value');
 
-    if ~isempty(strfind(tmp,'Matlab')) && ~isempty(handles.model_path)
-        handles.tooling_mode = 1;
-    else
-        handles.tooling_mode = 0;
-    end
-    
-    if (handles.tooling_mode == 0 && handles.acumen.instances > 1) || handles.tooling_mode == 1
+    if (handles.tooling_mode == 2 && handles.acumen.instances > 1) || handles.tooling_mode == 1
         % STATUS UPDATE GUI 
         temp=get(handles.statup,'String');
         set(handles.statup,'String',strvcat(strcat(datestr(now),'   [MATLAB] (T,t,e)-CLOSENESS check'),char(temp))); 
@@ -267,7 +252,7 @@ set(handles.statup,'String',strvcat(strcat(datestr(now),'   [MATLAB] Model loade
 drawnow;
 
 % Update menu structure
-set(handles.popupmenu24,'Enable','on');
+set(handles.popupmenu_toolingmode,'Enable','on');
 set(handles.pushbutton14,'Enable','on');
 if ~isempty(handles.implementation_path) && ~isempty(handles.model_path) 
     set(handles.pushbutton12,'Enable','on');   
@@ -306,8 +291,8 @@ drawnow;
 
 % Update menu structure
 if isempty(handles.model_path) 
-    handles.tooling_mode = 0;
-    set(handles.popupmenu24,'Enable','off');
+    handles.tooling_mode = 2;
+    set(handles.popupmenu_toolingmode,'Enable','off');
 end
 set(handles.pushbutton13,'Enable','on');
 set(handles.pushbutton14,'Enable','on');
@@ -425,16 +410,9 @@ function popupmenu9_Callback(hObject, eventdata, handles)
 cla(handles.axes1);
 
 % Determine tooling mode
-contents=cellstr(get(handles.popupmenu24,'String'));
-tmp = contents{get(handles.popupmenu24,'Value')};
+handles.tooling_mode = get(handles.popupmenu_toolingmode,'Value');
 
-if ~isempty(strfind(tmp,'Matlab')) && ~isempty(handles.model_path)
-    handles.tooling_mode = 1;
-else
-    handles.tooling_mode = 0;
-end
-
-if (handles.tooling_mode == 0 && handles.acumen.instances > 1) || handles.tooling_mode == 1
+if (handles.tooling_mode == 2 && handles.acumen.instances > 1) || handles.tooling_mode == 1
     % STATUS UPDATE GUI 
     temp=get(handles.statup,'String');
     set(handles.statup,'String',strvcat(strcat(datestr(now),'   [MATLAB] (T,t,e)-CLOSENESS check'),char(temp))); 
@@ -507,14 +485,7 @@ if ~isempty(handles.implementation_path)
     set(handles.pushbutton13,'Enable','off');
 
     % Determine tooling mode
-    contents=cellstr(get(handles.popupmenu24,'String'));
-    tmp = contents{get(handles.popupmenu24,'Value')};
-
-    if ~isempty(strfind(tmp,'Matlab')) && ~isempty(handles.model_path) 
-        handles.tooling_mode = 1;
-    else
-        handles.tooling_mode = 0;
-    end
+    handles.tooling_mode = get(handles.popupmenu_toolingmode,'Value');
 
     % Plot results
     axes(handles.axes1);
@@ -706,24 +677,16 @@ function axes8_CreateFcn(hObject, eventdata, handles)
 % Hint: place code in OpeningFcn to populate axes8
 
 
-% --- Executes on selection change in popupmenu24.
-function popupmenu24_Callback(hObject, eventdata, handles)
-% hObject    handle to popupmenu24 (see GCBO)
+% --- Executes on selection change in popupmenu_toolingmode.
+function popupmenu_toolingmode_Callback(hObject, eventdata, handles)
+% hObject    handle to popupmenu_toolingmode (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu24 contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from popupmenu24
+% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu_toolingmode contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from popupmenu_toolingmode
 
-
-contents=cellstr(get(handles.popupmenu24,'String'));
-tmp = contents{get(handles.popupmenu24,'Value')};
-
-if strcmp(tmp,'Matlab')
-    handles.tooling_mode = 1;
-else
-    handles.tooling_mode = 0;
-end
+handles.tooling_mode = get(handles.popupmenu_toolingmode,'Value');
 
 % Plot results
 cla(handles.axes1);
@@ -734,7 +697,7 @@ guidata(hObject, handles);
 
 
 % --- Executes during object creation, after setting all properties.
-function popupmenu24_CreateFcn(hObject, eventdata, handles)
+function popupmenu_toolingmode_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
@@ -791,7 +754,7 @@ set(handles.text11,'Visible','off');
 set(handles.text13,'Visible','off');
 
 set(handles.popupmenu25,'Enable','off');
-set(handles.popupmenu24,'Enable','off');
+set(handles.popupmenu_toolingmode,'Enable','off');
 set(handles.plotvar,'Enable','off');
 set(handles.selectoutput,'Enable','off');
 set(handles.popupmenu9,'Enable','off');

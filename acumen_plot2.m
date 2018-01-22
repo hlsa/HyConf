@@ -24,16 +24,9 @@ contents=cellstr(get(handles.plotvar,'String'));
 selected_var = contents{get(handles.plotvar,'Value')};
 contents2=cellstr(get(handles.selectoutput,'String'));
 selected_output = contents2{get(handles.selectoutput,'Value')};
-contents3=cellstr(get(handles.popupmenu24,'String'));
-tmp = contents3{get(handles.popupmenu24,'Value')};
-if ~isempty(strfind(tmp,'Matlab')) && ~isempty(handles.model_path) 
-    handles.tooling_mode = 1;
-    tooling_mode = 1;
-else
-    handles.tooling_mode = 0;
-    tooling_mode = 0;
-end
 
+handles.tooling_mode = get(handles.popupmenu_toolingmode,'Value');
+tooling_mode = handles.tooling_mode;
 
 % Output selection --
 if strcmp(selected_output,'Model output')
@@ -53,7 +46,7 @@ if special == 1
         X1 = testcase.time;
         index=find(ismember(testcase.var,selected_var));
         Y1 = testcase.data(index,:);
-    else
+    elseif tooling_mode == 2
         % Load data
         X1 = acumen.time;
         index=find(ismember(acumen.var,selected_var));
@@ -70,7 +63,7 @@ if special == 1
         title(selected_var);
         if tooling_mode == 1
             legend('Model [Matlab]');
-        else
+        elseif tooling_mode == 2
             legend('Model [Acumen]');
         end
     end
@@ -105,7 +98,7 @@ if special == 3
         X1 = testcase.time;
         index=find(ismember(testcase.var,selected_var));
         Y1 = testcase.data(index,:);
-    else
+    elseif tooling_mode == 2
         % Load data
         X1 = acumen.time;
         index=find(ismember(acumen.var,selected_var));
@@ -134,10 +127,10 @@ if special == 3
         xlabel('Time');
         ylabel('Value');
         title(selected_var);
-        if tooling_mode == 0
+        if tooling_mode == 1
+            legend('Model [Matlab]','Implementation [Acumen]');            
+        elseif tooling_mode == 2
             legend('Model [Acumen]','Implementation [Acumen]');
-        else
-            legend('Model [Matlab]','Implementation [Acumen]');
         end
     end
 end
