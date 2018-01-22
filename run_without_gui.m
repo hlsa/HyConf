@@ -31,15 +31,23 @@ run(handles.model_path);
 run('acumen_sim2.m');
 
 %% Run conformance check
+clc
 conformance.var = 't';
-conformance.tau = 0.005;
+conformance.tau = 0.01;
 conformance.epsilon = 1;
 run('conformance_check.m');
 
-while conformance.result ~= 1
-    run('conformance_check.m');
-    
-    conformance.epsilon = conformance.epsilon + 0.01;
+if conformance.result == 0
+    while conformance.result ~= 1
+        conformance.epsilon = conformance.epsilon + 0.01;
+        run('conformance_check.m');
+    end
+else
+    while conformance.result ~= 0
+        conformance.epsilon = conformance.epsilon - 0.01;
+        run('conformance_check.m');
+    end
 end
 
-minimum_epsilon = conformance.epsilon - 0.01
+txt = sprintf('The critical epsilon is equal to %.2f \nwith tau being equal to %.4f', conformance.epsilon, conformance.tau);
+disp(txt)
