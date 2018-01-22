@@ -22,7 +22,7 @@ function varargout = gui(varargin)
 
 % Edit the above text to modify the response to readme gui
 
-% Last Modified by GUIDE v2.5 27-Oct-2016 09:36:49
+% Last Modified by GUIDE v2.5 22-Jan-2018 10:29:06
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -100,15 +100,30 @@ handles.testcase.time = [];
 handles.testcase.inputvalue = [];
 handles.testcase.inputvar = {};    
 
+% Load Leicester University logo
+axes(handles.logo_leicester);
+image(100,100,imread('logo_leicester.jpg'));
+axis(handles.logo_leicester, 'off')
+
+% Load Universidade Federal de Pernambuco logo
+axes(handles.logo_ufp);
+image(100,100,imread('logo_ufp.jpg'));
+axis(handles.logo_ufp, 'off')
+
+% Load Leicester University logo
+axes(handles.logo_leicester);
+image(100,100,imread('logo_leicester.jpg'));
+axis(handles.logo_leicester, 'off')
+
 % Load TUE LOGO
-axes(handles.axes6);
-image(100,100,imread('logo-tue.jpg'));
-axis(handles.axes6, 'off')
+axes(handles.logo_tue);
+image(100,100,imread('logo_tue.jpg'));
+axis(handles.logo_tue, 'off')
 
 % Load Halmstad University logo
-axes(handles.axes7);
-image(100,100,imread('hu.jpg'));
-axis(handles.axes7, 'off')
+axes(handles.logo_hu);
+image(100,100,imread('logo_hu.jpg'));
+axis(handles.logo_hu, 'off')
 
 % Determine tooling mode
 contents=cellstr(get(handles.popupmenu24,'String'));
@@ -239,6 +254,13 @@ function select_model_Callback(hObject, eventdata, handles)
 [filename,filepath] = uigetfile('*.m','Select the MATLAB system model .m file');
 handles.model_path=strcat(filepath,filename);
 
+if filename ~= 0    % only if a filename is selected
+    % Show the name of the the selected model
+    set(handles.text30,'Visible','off');
+    set(handles.text31,'String',filename);
+    set(handles.text31,'Visible','on');
+end
+
 % STATUS UPDATE GUI 
 temp=get(handles.statup,'String');
 set(handles.statup,'String',strvcat(strcat(datestr(now),'   [MATLAB] Model loaded'),char(temp))); 
@@ -262,6 +284,13 @@ function select_implementation_Callback(hObject, eventdata, handles)
 
 [filename,filepath] = uigetfile('*.acm','Select the system implementation .ACM file');
 handles.implementation_path = strcat(filepath,filename);
+
+if filename ~= 0    % only if a filename is selected
+    % Show the name of the the selected implementation
+    set(handles.text32,'Visible','off');
+    set(handles.text33,'String',filename);
+    set(handles.text33,'Visible','on'); 
+end
 
 % Import input, system and sim variables
 run('ACMfile_import2.m');
@@ -515,9 +544,9 @@ end
 
 
 % --- Executes during object creation, after setting all properties.
-function axes6_CreateFcn(hObject, eventdata, handles)
+function logo_tue_CreateFcn(hObject, eventdata, handles)
 % --- Executes during object creation, after setting all properties.
-function axes7_CreateFcn(hObject, eventdata, handles)
+function logo_hu_CreateFcn(hObject, eventdata, handles)
 % --------------------------------------------------------------------
 function README_Callback(hObject, eventdata, handles)
 
@@ -737,6 +766,12 @@ handles.acumen.instances = 0;
 handles.testcase.time = [];
 handles.testcase.inputvalue = [];
 handles.testcase.inputvar = {};    
+
+% Reset model and implementation names in file load
+set(handles.text30,'Visible','on');
+set(handles.text32,'Visible','on');
+set(handles.text31,'Visible','off');
+set(handles.text33,'Visible','off');
 
 % Update menu structure
 handles.useraction1 = 0;
