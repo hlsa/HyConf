@@ -201,7 +201,8 @@ if strcmp(get(handles.pushbutton13,'Enable'),'off') && handles.useraction1 == 1 
         set(handles.popupmenu9,'Enable','on');   
     
     elseif handles.tooling_mode == 3
-        disp('Conformance testing Matlab model and implementation');
+%         disp('Conformance testing Matlab model and implementation');
+        set(handles.popupmenu9,'String',strvcat(char([cellstr('Overview');cellstr('Zoom')])));
         run('TJte_closeness2.m');
         set(handles.popupmenu9,'Enable','on'); 
         
