@@ -61,9 +61,9 @@ for m=1:1:max(size(conformance.var))
         X1 = model.time;
         Y1 = model.data(index_model,:);
         
-        index_model=find(ismember(implementation.variables,conformance.var(1,m)));
+        index_implementation=find(ismember(implementation.variables,conformance.var(1,m)));
         X2 = implementation.time;
-        Y2 = implementation.data(index_model,:);
+        Y2 = implementation.data(index_implementation,:);
     end
 
 

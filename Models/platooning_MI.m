@@ -40,8 +40,8 @@ t = t_start:dt:t_end;
 % end
 
 %% Simulation 3
-a_max = 1.5;
-a_min = -1;
+a_max = 0.75;
+a_min = -0.25;
 
 for i = 1:length(t)
     if i*dt <= 10
@@ -84,7 +84,7 @@ delta = 4; %        acceleration exponent
 l_avg = 4.8; %m     average car length
 
 
-x_f(1) = 75;
+x_f(1) = 77.8;
 v_f(1) = 10;
 a_f(1) = 0;
 
