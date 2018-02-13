@@ -15,7 +15,7 @@
 
 
 %function [conformance] = TJte_closeness(testcase,acumen,TJte_closeness_mode,conformance)
-
+disp('Start conformance testing')
 testcase = handles.testcase;
 acumen = handles.acumen;
 tooling_mode = handles.tooling_mode;
@@ -201,4 +201,6 @@ for m=1:1:max(size(conformance.var))
         conformance.iteration = 0;
     end
 end
+
+disp('Finished conformance testing')
     

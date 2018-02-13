@@ -40,8 +40,8 @@ t = t_start:dt:t_end;
 % end
 
 %% Simulation 3
-a_max = 0.75;
-a_min = -0.25;
+a_max = 1;
+a_min = -0.5;
 
 for i = 1:length(t)
     if i*dt <= 10
@@ -78,13 +78,13 @@ end
 v_0 = 120; %m/s     desired speed
 T = 1.5; %s         time headway
 s_0 = 2.0; %m       minimum gap
-a = 1.4; %m/s^2     acceleration
+a = 2.0; %m/s^2     acceleration
 b = 2.0; %m/s^2     deceleration
 delta = 4; %        acceleration exponent
 l_avg = 4.8; %m     average car length
 
 
-x_f(1) = 77.8;
+x_f(1) = 78.2;
 v_f(1) = 10;
 a_f(1) = 0;
 
@@ -95,47 +95,61 @@ for time = t(2:end)
     s = x_l(i-1)-x_f(i-1)-l_avg;
     
     a_f(i) = a*(1-((v_f(i-1)/v_0))^delta-(s_star/s)^2);
-    v_f(i) = (v_f(i-1)+a_f(i)*dt);
-    x_f(i) = x_f(i-1)+v_f(i)*dt+0.5*a_f(i)*dt^2;
+    v_f(i) = v_f(i-1)+a_f(i-1)*dt;
+    x_f(i) = x_f(i-1)+v_f(i-1)*dt+0.5*a_f(i-1)*dt^2;
 end
 
-% small fix for the beginning 
-a_f(1) = a_f(2);
+% small fix for the beginning
 
 %% Plot the results
-% figure(1)
-% subplot(3,1,1)
-% hold on
-% plot(t,a_l)
-% plot(t,a_f)
-% title('Acceleration')
-% ylabel('a (m/s^2)')
-% xlabel('t (s)')
-% legend('Leader','Follower')
-% subplot(3,1,2)
-% hold on
-% plot(t,v_l)
-% plot(t,v_f)
-% title('Velocity')
-% ylabel('v (m/s)')
-% xlabel('t (s)')
-% legend('Leader','Follower')
-% subplot(3,1,3)
-% hold on
-% plot(t,x_l)
-% plot(t,x_f)
-% title('Position')
-% ylabel('x (m)')
-% xlabel('t (s)')
-% legend('Leader','Follower')
+figure(1)
+subplot(3,1,1)
+hold on
+plot(t,a_l)
+plot(t,a_f)
+title('Acceleration')
+ylabel('a (m/s^2)')
+xlabel('t (s)')
+legend('Leader','Follower')
+subplot(3,1,2)
+hold on
+plot(t,v_l)
+plot(t,v_f)
+title('Velocity')
+ylabel('v (m/s)')
+xlabel('t (s)')
+legend('Leader','Follower')
+subplot(3,1,3)
+hold on
+plot(t,x_l)
+plot(t,x_f)
+title('Position')
+ylabel('x (m)')
+xlabel('t (s)')
+legend('Leader','Follower')
 % 
 % figure(2)
 % plot(t,x_l-x_f-l_avg)
 % title('Bumper-bumper distance')
 % xlabel('t (s)')
 % ylabel('distance (m)')
+%%
+figure(3)
+plot([0 60],[0 0], 'k')
 
+hold on
+plot(t,a_l,'b','LineWidth',2)
+plot([0,15],[a_max, a_max], 'k--','LineWidth',2)
+plot([0,40],[a_min, a_min], 'k--','LineWidth',2)
 
+axis([0,60,a_min-0.5,a_max+0.5])
+text(7.0,1.2,'a_{max}','FontSize',12)
+text(19,-0.3,'a_{min}','FontSize',12)
+xlabel('time (s)')
+ylabel('acceleration (m/s^2)')
+title('Predescribed acceleration for the leading car','FontSize',20)
+set(gca,'fontsize',16)
+%%
 model.variables = {'x','v','a'};
 model.data(1,:) = x_l;
 model.data(2,:) = v_l;

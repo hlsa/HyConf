@@ -162,9 +162,9 @@ function start_analysis_Callback(hObject, eventdata, handles)
 % Clear axis
 cla(handles.axes1);
 
-
 % Check for performed test case execution
-if strcmp(get(handles.pushbutton13,'Enable'),'off') && handles.useraction1 == 1 && handles.useraction2 == 1
+if handles.useraction1 == 1 && handles.useraction2 == 1
+% if strcmp(get(handles.pushbutton13,'Enable'),'off') && handles.useraction1 == 1 && handles.useraction2 == 1
 
     % Determine tooling mode
     handles.tooling_mode = get(handles.popupmenu_toolingmode,'Value');
@@ -281,6 +281,7 @@ drawnow;
 set(handles.popupmenu_toolingmode,'Enable','on');
 set(handles.pushbutton14,'Enable','on');
 set(handles.pushbutton16,'Enable','on');
+set(handles.pushbutton13,'Enable','on');
 if ~isempty(handles.implementation_path) && ~isempty(handles.model_path) 
     set(handles.pushbutton12,'Enable','on');   
 end
@@ -500,45 +501,76 @@ function pushbutton13_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Check for existing implementation path
-if ~isempty(handles.implementation_path)
+handles.tooling_mode = get(handles.popupmenu_toolingmode,'Value');
+tooling_mode = handles.tooling_mode;
+
+if handles.tooling_mode == 1 || handles.tooling_mode == 2
+
+    % Check for existing implementation path
+    if ~isempty(handles.implementation_path)
+
+        % STATUS UPDATE GUI 
+        temp=get(handles.statup,'String');
+        set(handles.statup,'String',strvcat(strcat(datestr(now),'   [Acumen] Start / load model file'),char(temp))); 
+        drawnow;
+        temp=get(handles.statup,'String');
+        set(handles.statup,'String',strvcat(strcat(datestr(now),'   [Acumen] Start server mode'),char(temp))); 
+        drawnow;
+        temp=get(handles.statup,'String');
+        set(handles.statup,'String',strvcat(strcat(datestr(now),'   [MATLAB] Run JAVA client'),char(temp))); 
+        drawnow;
+
+        % Clear graph
+        cla(handles.axes1);
+
+        % Run acumen simulation
+        run('acumen_sim2.m');
+
+        % Update menu structure
+        set(handles.pushbutton13,'Enable','off');
+
+        % Determine tooling mode
+        handles.tooling_mode = get(handles.popupmenu_toolingmode,'Value');
+
+        % Plot results
+        axes(handles.axes1);
+        run('acumen_plot2.m');
+
+        % STATUS UPDATE GUI 
+        temp=get(handles.statup,'String');
+        set(handles.statup,'String',strvcat(strcat(datestr(now),'   PLOT:',selected_var),char(temp))); 
+        drawnow;
+
+        % Update handles structure
+        guidata(hObject, handles);
+
+        % Update menu structure
+        set(handles.plotvar,'Enable','on');
+        set(handles.selectoutput,'Enable','on');
+        set(handles.popupmenu25,'Enable','on');
+        set(handles.edit11,'Enable','on');
+        set(handles.edit12,'Enable','on');
+        set(handles.edit13,'Enable','on');
+        set(handles.start_analysis,'Enable','on');
+        set(handles.pushbutton15,'Enable','on');
+        
+    end
+
+elseif handles.tooling_mode == 3
+    temp=get(handles.statup,'String');
+    set(handles.statup,'String',strvcat(strcat(datestr(now),'   [MATLAB] Loading data from model and implementation'),char(temp))); 
+    drawnow;
+
+    % Run test case generation file
+    run(handles.model_path);
     
-    % STATUS UPDATE GUI 
-    temp=get(handles.statup,'String');
-    set(handles.statup,'String',strvcat(strcat(datestr(now),'   [Acumen] Start / load model file'),char(temp))); 
-    drawnow;
-    temp=get(handles.statup,'String');
-    set(handles.statup,'String',strvcat(strcat(datestr(now),'   [Acumen] Start server mode'),char(temp))); 
-    drawnow;
-    temp=get(handles.statup,'String');
-    set(handles.statup,'String',strvcat(strcat(datestr(now),'   [MATLAB] Run JAVA client'),char(temp))); 
-    drawnow;
-
-    % Clear graph
-    cla(handles.axes1);
-
-    % Run acumen simulation
-    run('acumen_sim2.m');
-
+%     handles.matlab.model = model;
+%     handles.matlab.implementation = implementation;
+    
     % Update menu structure
-    set(handles.pushbutton13,'Enable','off');
-
-    % Determine tooling mode
-    handles.tooling_mode = get(handles.popupmenu_toolingmode,'Value');
-
-    % Plot results
-    axes(handles.axes1);
-    run('acumen_plot2.m');
-
-    % STATUS UPDATE GUI 
-    temp=get(handles.statup,'String');
-    set(handles.statup,'String',strvcat(strcat(datestr(now),'   PLOT:',selected_var),char(temp))); 
-    drawnow;
-
-    % Update handles structure
-    guidata(hObject, handles);
-
-    % Update menu structure
+    set(handles.plotvar,'String',char(handles.matlab.model.variables));
+    set(handles.popupmenu25,'String',char(handles.matlab.model.variables));
+    
     set(handles.plotvar,'Enable','on');
     set(handles.selectoutput,'Enable','on');
     set(handles.popupmenu25,'Enable','on');
@@ -546,8 +578,18 @@ if ~isempty(handles.implementation_path)
     set(handles.edit12,'Enable','on');
     set(handles.edit13,'Enable','on');
     set(handles.start_analysis,'Enable','on');
-    set(handles.pushbutton15,'Enable','on');
+    
+    % Plot results
+    cla(handles.axes1);
+    axes(handles.axes1);
+    run('matlab_plot.m');
 
+    % Update menu structure
+    set(handles.pushbutton16,'Enable','off');
+    
+    % Update handles structure
+    guidata(hObject, handles);
+    
 end
 
 
