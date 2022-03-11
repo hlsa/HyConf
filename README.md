@@ -1,2 +1,2 @@
 # cps-conf-tool
-Tool for conformance testing of Cyber-Physical Systems
+Tool for conformance testing and causality analysis of Cyber-Physical Systems
