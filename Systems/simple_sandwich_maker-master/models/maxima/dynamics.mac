@@ -1,0 +1,155 @@
+/* AUXILIARY FUNCTIONS */
+
+load("eigen")$
+skew_symmetric(_w) := matrix([0, -_w[3,1], _w[2,1]],[_w[3,1],0,-_w[1,1]],[-_w[2,1],_w[1,1],0])$
+block_matrix(_M11,_M12,_M21,_M22) := block([_M1:addcol(_M11,_M12),_M2:addcol(_M21,_M22)], addrow(_M1,_M2))$
+ad(_V) := block([_w:covect([_V[1,1],_V[2,1],_V[3,1]]), v:covect([_V[4,1],_V[5,1],_V[6,1]])], block_matrix(skew_symmetric(_w),zeromatrix(3,3),skew_symmetric(v), skew_symmetric(_w)))$
+ad2(_V1,_V2) := ad(_V1)._V2$
+ad2_T(_V,_F) := transpose(ad(_V))._F$
+Ad(_M) := block([R:submatrix(4,_M,4), p: submatrix(4,_M,1,2,3)], block_matrix(R,zeromatrix(3,3),skew_symmetric(p).R, R))$
+Ad2(_M,_S) := Ad(_M)._S$
+Ad2_T(_M,_S) := transpose(Ad(_M))._S$
+matrix_twist(_V) := block([_w:covect([_V[1,1],_V[2,1],_V[3,1]]), v:covect([_V[4,1],_V[5,1],_V[6,1]])],
+        block_matrix(skew_symmetric(_w), v, zeromatrix(1,3),zeromatrix(1,1)))$
+
+/* PROBLEM PARAMETERS */
+/* link configurations at s[1] = 0 and s[2] = 0 */
+M_1:matrix([1,0,0,L_1],[0,1,0,0],[0,0,1,0],[0,0,0,1])$
+M_2:matrix([1,0,0,L_1+L_2],[0,1,0,0],[0,0,1,0],[0,0,0,1])$
+M:[M_1,M_2]$
+
+/* screw axes */
+S_1: covect([0,0,1,0,0,0])$
+S_2: covect([0,0,1,0,-L_1,0])$
+S:[S_1,S_2]$
+
+/* spacial inertia matrices */
+G[1]: diag_matrix(0,0,0,m_1,m_1,m_1)$
+G[2]: diag_matrix(0,0,0,m_2,m_2,m_2)$
+
+/* velocity and acceleration twists of the base link */
+V0: covect([0,0,0,0,0,0])$
+Vdot0: covect([0,0,0,0,-g,0])$
+
+/* number links, initial values for configuration matrices */
+N: 2$
+M2[0,0]: ident(4)$
+for i: 1 thru N do M2[0,i]: M[i]$
+M2[i,j] := invert(M2[0,i]).M2[0,j]$
+
+/* MAIN FUNCTION DEFINITIONS -- memoizing functions */
+A[i] := Ad2(invert(M2[0,i]),S[i])$
+T[i,j] := if i = N+1 or j = N+1 then ident(4) else trigreduce(demoivre(M2[i,j].matrixexp(matrix_twist(A[j]),s[j])))$
+
+V[i]:= if i = 0 then V0 else trigreduce(Ad2(trigsimp(invert(T[i-1,i])),V[i-1])+A[i]*v[i])$
+Vdot[i]:= if i = 0 then Vdot0 else trigreduce(Ad2(trigsimp(invert(T[i-1,i])),Vdot[i-1])+ad2(V[i],A[i])*v[i]+A[i]*a[i])$
+F[i]:= if i = N+1 then covect([0,0,0,0,0,0]) else Ad2_T(T[i+1,i],F[i+1])+G[i].Vdot[i]-ad2_T(V[i],G[i].V[i])$
+f_tau[i]:= factor(ratsimp(trigreduce(transpose(F[i]).A[i])))$
+
+/* SPECIFICATION OF INVERSE DYNAMICS */
+eqs: []$ vars: []$
+for k: 1 thru N do block([eq:tau[k] = f_tau[k]],eqs:append(eqs,[eq]), vars:append(vars,[a[k]]))$
+
+/* SOLUTION OF FORWARD DYNAMICS */
+/*
+	inputs:
+		tau[i] is the torque/force applied to the joint i.
+		s[i] is the position of joint i.
+		v[i] is the velocity of joint i.
+	outputs:
+		a[i] is the resulting acceleration of joint i.
+*/
+sols:solve(eqs,vars)$
+
+sol1: sols[1][1]$
+sol2: sols[1][2]$
+
+subst(s1,s[1],sol1)$
+subst(tau1,tau[1],%)$
+subst(tau2,tau[2],%)$
+subst(a1,a[1],%)$
+eq1:%$
+
+subst(s1,s[1],sol2)$
+subst(s2,s[2],%)$
+subst(tau1,tau[1],%)$
+subst(tau2,tau[2],%)$
+subst(a1,a[1],%)$
+subst(a2,a[2],%)$
+subst(v1,v[1],%)$
+subst(v2,v[2],%)$
+eq2: %$
+
+/* 
+	Adding a negative component to the acceleration to model dampening.
+	Ideally, I should add it to the definition of the forces acting on
+	the system.
+*/
+eqs: [rhs(eq1)-v1,v1,rhs(eq2)-2*v2,v2]$
+vars: [v1,s1,v2,s2]$
+
+G: 0$ /*-9.8*/
+
+simulate(eqs,vars,L1,L2,m1,m2,t1,t2,T,delta) :=block([neqs:trigsimp(subst([L_1 = L1, L_2 = L2, m_1 = m1, m_2 = m2, g = G, tau1=t1, tau2=t2],eqs))],rk(neqs,vars,[0,0,0,0],[t,0,T,delta]))$
+
+FK:T[0,1].T[1,2]$
+positionFK1(s1,s2,L1,L2) := block([p:subst([s[1]=s1,s[2]=s2,L_1=L1,L_2=L2],T[0,1])],[p[1,4],p[2,4],p[3,4]])$
+positionFK2(s1,s2,L1,L2) := block([p:subst([s[1]=s1,s[2]=s2,L_1=L1,L_2=L2],FK)],[p[1,4],p[2,4],p[3,4]])$
+
+simulateXY1(eqs,vars,L1,L2,m1,m2,t1,t2,T,delta) :=block(
+	[sol:simulate(eqs,vars,L1,L2,m1,m2,t1,t2,T,delta)],
+	makelist(append([p[1]],args(positionFK1(p[3],p[5],L1,L2))),p,sol)
+)$
+simulateXY2(eqs,vars,L1,L2,m1,m2,t1,t2,T,delta) :=block(
+	[sol:simulate(eqs,vars,L1,L2,m1,m2,t1,t2,T,delta)],
+	makelist(append([p[1]],args(positionFK2(p[3],p[5],L1,L2))),p,sol)
+)$
+
+
+wrapto2pi(x) := mod(x,2*%pi)$
+
+solve_and_draw(eqs,vars,L1,L2,m1,m2,t1,t2,T,delta) :=
+block([sol:simulate(eqs,vars,L1,L2,m1,m2,t1,t2,T,delta)], wxplot2d([[discrete,makelist([p[1],p[3]],p,sol)],[discrete,makelist([p[1],p[5]],p,sol)]],[legend, "s1", "s2"]))$
+
+
+drawXY(eqs,vars,L1,L2,m1,m2,t1,t2,T,delta) :=
+block([sol:simulateXY(eqs,vars,L1,L2,m1,m2,t1,t2,T,delta)], wxplot2d([[discrete,makelist([p[1],p[2]],p,sol)],[discrete,makelist([p[1],p[3]],p,sol)]],[legend, "x", "y"]))$
+
+drawX(eqs,vars,L1,L2,m1,m2,t1,t2,T,delta) :=
+block([sol:simulateXY(eqs,vars,L1,L2,m1,m2,t1,t2,T,delta)], wxplot2d([[discrete,makelist([p[1],p[2]],p,sol)]],[legend, "x"]))$
+
+drawY(eqs,vars,L1,L2,m1,m2,t1,t2,T,delta) :=
+block([sol:simulateXY(eqs,vars,L1,L2,m1,m2,t1,t2,T,delta)], wxplot2d([[discrete,makelist([p[1],p[3]],p,sol)]],[legend, "y"]))$
+
+t1:0.01$
+t2:0$
+/*
+solve_and_draw(eqs,vars,0.3,0.3,0.1,0.1,t1,t2,10,0.1);
+drawX(eqs,vars,0.3,0.3,0.1,0.1,t1,t2,10,0.1);
+drawY(eqs,vars,0.3,0.3,0.1,0.1,t1,t2,10,0.1);
+*/
+pts1: simulateXY1(eqs,vars,0.3,0.3,0.1,0.1,t1,t2,10,0.1)$
+pts2: simulateXY2(eqs,vars,0.3,0.3,0.1,0.1,t1,t2,10,0.1)$
+
+load("draw")$
+wxanimate_autoplay:false$
+wxanimate_framerate:10$
+with_slider_draw(
+   vr,makelist(i,i,1,100,1),
+   title=concat("Robotic Arm:",vr),
+   point_size=2,
+   point_type=circle,
+   points_joined=true,
+   points([[0,0],[pts1[vr][2], pts1[vr][3]],[pts2[vr][2], pts2[vr][3]]]),
+   xrange=[-1,1],
+   yrange=[-1,1]
+)$
+
+/* The problem here is that there are no other forces acting on the system to the movement never stops */
+
+/* can we add dampening simply by adding a (negative) friction component -b*l*dtheta/dt to F[i] (possibly -bVdot[i])?*/
+
+
+/*
+wxanimate(a, 10, sin(a*x), [x,-5,5]), wxanimate_framerate=6$
+*/

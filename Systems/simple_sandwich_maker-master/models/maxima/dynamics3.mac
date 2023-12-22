@@ -1,0 +1,46 @@
+load("eigen")$
+skew_symmetric(_w) := matrix([0, -_w[3,1], _w[2,1]],[_w[3,1],0,-_w[1,1]],[-_w[2,1],_w[1,1],0])$
+block_matrix(_M11,_M12,_M21,_M22) := block([_M1:addcol(_M11,_M12),_M2:addcol(_M21,_M22)], addrow(_M1,_M2))$
+ad(_V) := block([_w:covect([_V[1,1],_V[2,1],_V[3,1]]), v:covect([_V[4,1],_V[5,1],_V[6,1]])], block_matrix(skew_symmetric(_w),zeromatrix(3,3),skew_symmetric(v), skew_symmetric(_w)))$
+ad2(_V1,_V2) := ad(_V1)._V2$
+ad2_T(_V,_F) := transpose(ad(_V))._F$
+Ad(_M) := block([R:submatrix(4,_M,4), p: submatrix(4,_M,1,2,3)], block_matrix(R,zeromatrix(3,3),skew_symmetric(p).R, R))$
+Ad2(_M,_S) := Ad(_M)._S$
+Ad2_T(_M,_S) := transpose(Ad(_M))._S$
+matrix_twist(_V) := block([_w:covect([_V[1,1],_V[2,1],_V[3,1]]), v:covect([_V[4,1],_V[5,1],_V[6,1]])],
+        block_matrix(skew_symmetric(_w), v, zeromatrix(1,3),zeromatrix(1,1)));
+
+
+M[0,1]:matrix([1,0,0,L_1],[0,1,0,0],[0,0,1,0],[0,0,0,1]);
+M[0,2]:matrix([1,0,0,L_1+L_2],[0,1,0,0],[0,0,1,0],[0,0,0,1]);
+M[1,2]:invert(M[0,1]).M[0,2];
+S[1]: covect([0,0,1,0,0,0]);
+S[2]: covect([0,0,1,0,-L_1,0]);
+A[1]: Ad2(invert(M[0,1]),S[1]);
+A[2]: Ad2(invert(M[0,2]),S[2]);
+G[1]: diag_matrix(0,0,0,m_1,m_1,m_1);
+G[2]: diag_matrix(0,0,0,m_2,m_2,m_2);
+V[0]: covect([0,0,0,0,0,0]);
+Vdot[0]: covect([0,0,0,0,g,0]);
+
+T[0,1]: M[0,1].matrixexp(matrix_twist(A[1]),\theta_1), demoivre;
+T[1,0]: trigsimp(invert(T[0,1]));
+V[1]: Ad2(T[1,0],V[0])+A[1]*dotθ_1;
+Vdot[1]: Ad2(T[1,0],Vdot[0])+ad2(V[1],A[1])*dotθ_1+A[1]*ddotθ_1;
+
+T[1,2]: M[1,2].matrixexp(matrix_twist(A[2]),θ_2), demoivre;
+T[2,1]: trigsimp(invert(T[1,2]));
+V[2]: Ad2(T[2,1],V[1])+A[2]*dotθ_2;
+Vdot[2]: trigreduce(Ad2(T[2,1],Vdot[1])+ad2(V[2],A[2])*dotθ_2+A[2]*ddotθ_2);
+
+F[3]: covect([0,0,0,0,0,0]);
+T[2,3]: ident(4);
+T[3,2]: T[2,3];
+
+F[2]: Ad2_T(T[3,2],F[3])+G[2].Vdot[2]-ad2_T(V[2],G[2].V[2]);
+F[2]:ratsimp(trigreduce(F[2]));
+τ[2]: factor(ratsimp(trigreduce(transpose(F[2]).A[2])));
+
+F[1]: Ad2_T(T[2,1],F[2])+G[1].Vdot[1]-ad2_T(V[1],G[1].V[1]);
+F[1]:ratsimp(trigreduce(F[1]));
+τ[1]: factor(ratsimp(trigreduce(transpose(F[1]).A[1])));

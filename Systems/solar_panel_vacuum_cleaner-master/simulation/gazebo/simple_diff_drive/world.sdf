@@ -1,0 +1,218 @@
+<sdf version='1.7'>
+  <world name='default'>
+
+	<!-- <physics default="1" name="default_physics" type="bullet">
+  	<max_contacts>20</max_contacts>
+	  <bullet>
+	    <solver>
+		      <type>quick</type>
+	      <iters>50</iters>
+	      <sor>1.3</sor>
+	      <min_step_size>0.0001</min_step_size>
+	    </solver>
+	    <constraints>
+	      <split_impulse>1</split_impulse>
+	      <cfm>0</cfm>
+	      <erp>0.2</erp>
+	      <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+	      <contact_surface_layer>0.001</contact_surface_layer>
+	    </constraints>
+	  </bullet>
+	  <real_time_factor>1</real_time_factor>
+	  <max _step_size>0.001</max_step_size>
+	  <real_time_update_rate>1000</real_time_update_rate>
+	</physics> -->
+    
+
+    <!-- <physics type='ode'>
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+    </physics> -->
+
+    <physics type='ode' default='1'>
+      <!-- <real_time_factor>10</real_time_factor> -->
+      <solver>
+        <iters>10</iters>
+      </solver>
+      <max_step_size>0.001</max_step_size>
+    </physics>
+
+    <light name='sun' type='directional'>
+      <cast_shadows>1</cast_shadows>
+      <pose>0 0 10 0 -0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+    <model name='ground_plane'>
+      <static>1</static>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <surface>
+            <contact>
+              <collide_bitmask>65535</collide_bitmask>
+              <ode/>
+            </contact>
+            <friction>
+              <ode>
+                <mu>100</mu>
+                <mu2>50</mu2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='visual'>
+          <cast_shadows>0</cast_shadows>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <gravity>0 0 -9.8</gravity>
+    <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
+    <atmosphere type='adiabatic'/>
+    <scene>
+      <ambient>0.4 0.4 0.4 1</ambient>
+      <background>0.7 0.7 0.7 1</background>
+      <shadows>1</shadows>
+    </scene>
+    <audio>
+      <device>default</device>
+    </audio>
+    <wind/>
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <latitude_deg>0</latitude_deg>
+      <longitude_deg>0</longitude_deg>
+      <elevation>0</elevation>
+      <heading_deg>0</heading_deg>
+    </spherical_coordinates>
+   
+    <gui fullscreen='0'>
+      <!-- <camera name='user_camera'>
+        <pose>0.136713 -0.266689 0.034103 0 0.063642 2.0082</pose>
+        <view_controller>orbit</view_controller>
+        <projection_type>perspective</projection_type>
+      </camera> -->
+      <!-- <camera name='user_camera'>
+        <pose>2.38255 -3.20405 3.57828 0 0.843642 1.8322</pose>
+        <view_controller>orbit</view_controller>
+        <projection_type>perspective</projection_type>
+      </camera> -->
+      <camera name='user_camera'>
+        <pose>0.059826 -0.262021 2.65508 2e-05 1.5698 1.57221</pose>
+        <view_controller>ortho</view_controller>
+        <projection_type>orthographic</projection_type>
+      </camera>
+    </gui>
+    
+    <state world_name='default'>
+      <sim_time>0 0</sim_time>
+      <real_time>0 0</real_time>
+      <wall_time>1600447658 438868163</wall_time>
+      <iterations>0</iterations>
+      <model name='ground_plane'>
+        <pose>0 0 0 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose>0 0 0 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      
+      <light name='sun'>
+        <pose>0 0 10 0 -0 0</pose>
+      </light>
+    </state>
+
+    <model name="camera">
+    <static>true</static>
+    <link name="link">
+      <pose>-0.999832 -0.824378 1.5442 0 0.725798 0.712154</pose>
+      <inertial>
+        <mass>0.1</mass>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <box>
+            <size>0.1 0.1 0.1</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <box>
+            <size>0.1 0.1 0.1</size>
+          </box>
+        </geometry>
+      </visual>
+      <sensor name="camera" type="camera">
+        <camera>
+          <horizontal_fov>1.047</horizontal_fov>
+          <image>
+            <width>640</width>
+            <height>480</height>
+          </image>
+          <clip>
+            <near>0.1</near>
+            <far>100</far>
+          </clip>
+          <save enabled="true">
+            <path>/tmp</path>
+          </save>
+        </camera>
+        <always_on>1</always_on>
+        <update_rate>30</update_rate>
+        <visualize>true</visualize>
+      </sensor>
+    </link>
+  </model>
+    
+    <include>
+      <uri>model://solarpanel</uri>
+      <name>solarpanel</name>
+    </include>
+
+    <include>
+      <!-- <pose>0 0 0 0 -0.52 1.5707</pose> -->
+      <pose relative_to="solarpanel">
+        -0.45 -0.35 0.005 0 0 3.1415926535897
+      </pose>
+    	<uri>model://robot</uri>
+    	<name>robot</name>
+    </include>
+  </world>
+</sdf>

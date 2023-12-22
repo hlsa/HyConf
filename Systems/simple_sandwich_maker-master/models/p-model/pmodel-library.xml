@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sdf:RSPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:sdf="http://www.circus.robocalc/sdf">
+  <temp xsi:type="sdf:JointDef" name="Revolute">
+    <inputs>
+      <type name="real"/>
+      <variable name="rj" value=""/>
+    </inputs>
+    <outputs>
+      <type name="Quaternion"/>
+      <variable name="rot"/>
+    </outputs>
+    <locals>
+      <type name="real"/>
+      <variable name="theta"/>
+    </locals>
+    <constants>
+      <type name="real*real*real"/>
+      <variable name="axis"/>
+    </constants>
+    <equations display="rot = rot2q(axis,theta)"/>
+    <equations display="theta'=rj"/>
+  </temp>
+  <temp xsi:type="sdf:JointDef" name="Prismatic">
+    <inputs>
+      <type name="real"/>
+      <variable name="pj"/>
+    </inputs>
+    <outputs>
+      <type name="Quaternion"/>
+      <variable name="pos"/>
+    </outputs>
+    <constants>
+      <type name="real*real*real"/>
+      <variable name="axis"/>
+    </constants>
+    <equations display="pid(pj, pos)"/>
+    <equations display="done:|pj, pos| \leq \epsilon"/>
+  </temp>
+  <temp xsi:type="sdf:ActuatorDef" name="suctionCup">
+    <inputs>
+      <type name="real"/>
+      <variable name="voltage"/>
+    </inputs>
+    <outputs>
+      <type name="real"/>
+      <variable name="force"/>
+    </outputs>
+  </temp>
+  <temp xsi:type="sdf:SensorDef" name="IR">
+    <inputs>
+      <type name="real"/>
+      <variable name="distance"/>
+    </inputs>
+    <outputs>
+      <type name="real"/>
+      <variable name="voltage"/>
+    </outputs>
+    <outputs>
+      <type name="real"/>
+      <variable name="x"/>
+    </outputs>
+    <outputs>
+      <type name="real"/>
+      <variable name="y"/>
+    </outputs>
+    <equations display="voltage=4*e^(-0.028784*distance)"/>
+    <equations display="x=distanceToX(distance)"/>
+    <equations display="y=distanceToY(distance)"/>
+  </temp>
+  <temp xsi:type="sdf:SensorDef" name="timeSensor">
+    <outputs>
+      <type name="real"/>
+      <variable name="value"/>
+    </outputs>
+  </temp>
+</sdf:RSPackage>

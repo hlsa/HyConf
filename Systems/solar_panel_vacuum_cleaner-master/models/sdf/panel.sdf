@@ -1,0 +1,112 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <model name="panel">
+    <pose>0 0 0 0 0 0</pose>
+	<static>false</static>	
+
+    <link name="panel">
+	    <pose>-1.2 0 0.5 0.5 0 0</pose>
+        
+        <collision name="ccharger">
+          <pose>-0.4 -0.25 0 0 0 0</pose>
+          <geometry>
+          <box>
+            <size>0.2 0.1 0.01</size>
+          </box>
+        </geometry>
+        </collision>
+        <visual name="vcharger">
+          <pose>-0.4 -0.35 0 0 0 0</pose>
+          <geometry>
+          <box>
+            <size>0.2 0.1 0.01</size>
+          </box>
+        </geometry>
+        </visual>
+              
+        <collision name="cpanel1">
+          <geometry>
+          <box>
+            <size>1 0.6 0.01</size>
+          </box>
+        </geometry>
+        </collision>
+        <visual name="vpanel1">
+          <geometry>
+          <box>
+            <size>1 0.6 0.01</size>
+          </box>
+        </geometry>
+        </visual>
+        
+        <collision name="cbridge1">
+          <pose>0.6 -0.25 0 0 0 0</pose>
+          <geometry>
+          <box>
+            <size>0.2 0.1 0.01</size>
+          </box>
+        </geometry>
+        </collision>
+        <visual name="vbridge1">
+          <pose>0.6 -0.25 0 0 0 0</pose>
+          <geometry>
+          <box>
+            <size>0.2 0.1 0.01</size>
+          </box>
+        </geometry>
+        </visual>
+        
+        <collision name="cpanel2">
+          <pose>1.2 0 0 0 0 0</pose>
+          <geometry>
+          <box>
+            <size>1 0.6 0.01</size>
+          </box>
+        </geometry>
+        </collision>
+        <visual name="vpanel2">
+          <pose>1.2 0 0 0 0 0</pose>        
+          <geometry>
+          <box>
+            <size>1 0.6 0.01</size>
+          </box>
+        </geometry>
+        </visual>
+        
+        <collision name="cbridge2">
+          <pose>1.8 -0.25 0 0 0 0</pose>
+          <geometry>
+          <box>
+            <size>0.2 0.1 0.01</size>
+          </box>
+        </geometry>
+        </collision>
+        <visual name="vbridge2">
+          <pose>1.8 -0.25 0 0 0 0</pose>
+          <geometry>
+          <box>
+            <size>0.2 0.1 0.01</size>
+          </box>
+        </geometry>
+        </visual>
+        
+        <collision name="cpanel3">
+          <pose>2.4 0 0 0 0 0</pose>
+          <geometry>
+          <box>
+            <size>1 0.6 0.01</size>
+          </box>
+        </geometry>
+        </collision>
+        <visual name="vpanel3">
+          <pose>2.4 0 0 0 0 0</pose>        
+          <geometry>
+          <box>
+            <size>1 0.6 0.01</size>
+          </box>
+        </geometry>
+        </visual>        
+    </link>
+
+  </model>
+</sdf>

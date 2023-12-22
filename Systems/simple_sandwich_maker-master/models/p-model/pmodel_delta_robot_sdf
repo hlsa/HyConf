@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sdf:RSPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:sdf="http://www.circus.robocalc/sdf">
+  <mappings>
+    <outputEvents event="lift()">
+      <constants>
+        <type name="real"/>
+        <variable name="h" value="0.235"/>
+      </constants>
+    </outputEvents>
+    <operations operation="set_v_theta(v_t:real)">
+      <equations display="theta.rj=v_t"/>
+    </operations>
+    <operations operation="set_v_radius(v_r:real)">
+      <equations display="radius.pj=v_r"/>
+    </operations>
+    <operations>
+      <equations display="height.pj=h"/>
+    </operations>
+    <operations operation="lower(dist:real)">
+      <equations display="height.pj=0.235-dist"/>
+    </operations>
+    <operations operation="drop()">
+      <equations display="actuationCup1.force=0"/>
+      <equations display="actuationCup2.force=0"/>
+    </operations>
+    <operations operation="pick()">
+      <equations display="actuationCup1.force=1"/>
+      <equations display="actuationCup2.force=1"/>
+    </operations>
+    <inputEvents event="rShapeX.x">
+      <equations display="Camera2.voltage>0.3"/>
+      <equations display="x=Camera2.x"/>
+    </inputEvents>
+    <inputEvents event="rShapeY.y">
+      <equations display="Camera2.voltage>0.3"/>
+      <equations display="y=Camera2.y"/>
+    </inputEvents>
+    <inputEvents event="lShapeX.x">
+      <equations display="Camera1.voltage>0.3"/>
+      <equations display="x=Camera1.x"/>
+    </inputEvents>
+    <inputEvents event="lShapeY.y">
+      <equations display="Camera1.voltage>0.3"/>
+      <equations display="y=Camera1.y"/>
+    </inputEvents>
+    <inputEvents event="rShapeTS.ts">
+      <equations display="Camera2.voltage>0.3"/>
+      <equations display="ts=timeSensor.t"/>
+    </inputEvents>
+    <inputEvents event="lShapeTS.ts">
+      <equations display="Camera1.voltage>0.3"/>
+      <equations display="ts=timeSensor.t"/>
+    </inputEvents>
+    <inputEvents event="lifted_TS">
+      <constants>
+        <type name="real"/>
+        <variable name="h" value="0.235"/>
+      </constants>
+      <equations display="height.pj=h"/>
+      <equations display="output=timeSensor.value"/>
+    </inputEvents>
+  </mappings>
+  <pmodels name="delta_robot">
+    <links relation="">
+      <pose z="0.05"/>
+      <element xsi:type="sdf:LinkDef" name="Base">
+        <inertial mass="50.0">
+          <inertia ixx="0.085" iyy="0.085" izz="0.166"/>
+        </inertial>
+        <bodies relation="">
+          <pose/>
+          <element xsi:type="sdf:BodyDef" name="base">
+            <geometry xsi:type="sdf:Box" x="1.0" y="1.0" z="0.1"/>
+          </element>
+        </bodies>
+        <bodies relation="">
+          <pose z="0.45"/>
+          <element xsi:type="sdf:BodyDef" name="column">
+            <geometry xsi:type="sdf:Box" x="0.02" y="0.02" z="1.0"/>
+          </element>
+        </bodies>
+        <joints relation="">
+          <pose z="0.95"/>
+          <element xsi:type="sdf:JointRef" name="theta">
+            <flexible link="//@pmodels.0/@links.1/@element"/>
+            <joint href="library.sdf#//@temp.0"/>
+          </element>
+        </joints>
+      </element>
+    </links>
+    <links relation="">
+      <element xsi:type="sdf:LinkDef" name="forarm">
+        <inertial mass="1.2">
+          <inertia ixx="0.00007" iyy="0.0075" izz="0.0075"/>
+        </inertial>
+        <bodies relation="">
+          <pose x="0.14" z="0.96"/>
+          <element xsi:type="sdf:BodyDef" name="forarm">
+            <geometry xsi:type="sdf:Box" x="0.3" y="0.02" z="0.02"/>
+          </element>
+        </bodies>
+        <joints relation="">
+          <pose x="0.14" z="0.97"/>
+          <element xsi:type="sdf:JointRef" name="radius">
+            <flexible link="//@pmodels.0/@links.2/@element"/>
+            <joint href="library.sdf#//@temp.1"/>
+            <instantiations name="axis" value="(1,0,0)"/>
+          </element>
+        </joints>
+      </element>
+    </links>
+    <links relation="">
+      <element xsi:type="sdf:LinkDef" name="arm">
+        <inertial mass="1.2">
+          <inertia ixx="0.0087" iyy="0.0188" izz="0.01021"/>
+        </inertial>
+        <bodies relation="">
+          <pose x="0.14" z="0.98"/>
+          <element xsi:type="sdf:BodyDef" name="arm1">
+            <geometry xsi:type="sdf:Box" x="0.3" y="0.02" z="0.02"/>
+          </element>
+        </bodies>
+        <bodies relation="">
+          <pose x="0.3" z="0.84"/>
+          <element xsi:type="sdf:BodyDef" name="arm2">
+            <geometry xsi:type="sdf:Box" x="0.02" y="0.02" z="0.3"/>
+          </element>
+        </bodies>
+        <joints relation="">
+          <pose x="0.31" z="0.84" roll="3.14"/>
+          <element xsi:type="sdf:JointRef" name="height">
+            <flexible link="//@pmodels.0/@links.3/@element"/>
+            <joint href="library.sdf#//@temp.1"/>
+          </element>
+        </joints>
+      </element>
+    </links>
+    <links relation="">
+      <element xsi:type="sdf:LinkDef" name="gripper">
+        <inertial mass="o.o64">
+          <inertia ixx="0.008451" iyy="0.008434" izz="0.00009635"/>
+        </inertial>
+        <bodies relation="">
+          <pose x="0.32" z="0.6875" yaw="2.09"/>
+          <element xsi:type="sdf:BodyDef" name="gripper1">
+            <geometry xsi:type="sdf:Box" x="0.08" y="0.01" z="0.005"/>
+          </element>
+        </bodies>
+        <bodies relation="">
+          <pose x="0.32" z="0.6875" yaw="-2.09"/>
+          <element xsi:type="sdf:BodyDef" name="gripper2">
+            <geometry xsi:type="sdf:Box" x="0.08" y="0.01" z="0.005"/>
+          </element>
+        </bodies>
+        <bodies relation="">
+          <pose x="0.32" z="0.84"/>
+          <element xsi:type="sdf:BodyDef" name="arm3">
+            <geometry xsi:type="sdf:Box" x="0.02" y="0.02" z="0.3"/>
+          </element>
+        </bodies>
+      </element>
+    </links>
+  </pmodels>
+  <temp xsi:type="sdf:Pose" z="0.05"/>
+</sdf:RSPackage>
+

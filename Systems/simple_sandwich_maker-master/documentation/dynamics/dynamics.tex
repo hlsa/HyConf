@@ -1,0 +1,814 @@
+\documentclass[]{scrreprt}
+
+\usepackage{siunitx}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+
+\usepackage[margin=1cm]{geometry}
+
+\newcommand{\myvec}[1]{\left(\begin{array}{c}#1\end{array}\right)}
+
+% Title Page
+\title{Simplified model of Millitec case study}
+\author{Alvaro Miyazawa}
+
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+	This document contains information about a simplified version of the Millitec case study
+	where the delta robot has been replaced by an open-chain robotic arm with a single
+	revolute joint and two prismatic joints.
+\end{abstract}
+
+\chapter{Structure and basic information}
+
+The robot is formed of four links:
+
+\begin{itemize}
+	\item Base -- the base is formed by a heavy base and a fixed column;
+	\item Forearm -- the forearm is a single cuboid;
+	\item Arm -- the arm consists of two cuboids fixed to each other in a $90^\circ$ angle;
+	\item Gripper -- the gripper consists of a gripper fixed to a cuboid.
+\end{itemize}
+
+\paragraph{Base.} The base (including the column) has a mass of 50.2 kg, and its inertia matrix is given below:
+\[
+I_{Base} = 
+\left(
+\begin{array}{ccc}
+\num{+8.497e-2} & \num{0} & \num{0}\\
+\num{0} & \num{+8.497e-2} & \num{0}\\
+\num{0} & \num{0} & \num{+1.660e-1}
+\end{array}
+\right)
+\]
+
+The centre of mass is $[0,0,0.05]^T$.
+
+
+\paragraph{Forearm.} The forearm has a mass of 1.2kg. It is connected to the base by a revolute joint (around the z-axis), and its inertia matrix is given below:
+
+\[
+I_{Forearm} = 
+\left(
+\begin{array}{ccc}
+\num{+6.667e-5} & \num{0} & \num{0}\\
+\num{0} & \num{+7.533e-3} & \num{0}\\
+\num{0} & \num{0} & \num{+7.533e-3}
+\end{array}
+\right)
+\]
+
+The centre of mass is $[0.14,0,1.01]^T$.
+
+\paragraph{Arm.} The arm has a mass of 720g. It is connected to the forearm by a prismatic joint (along the x-axis), and
+its inertia matrix is given below:
+
+\[
+I_{Arm} = 
+\left(
+\begin{array}{ccc}
+\num{+8.700e-3} & \num{0} & \num{0}\\
+\num{0} & \num{+1.883e-2} & \num{0}\\
+\num{0} & \num{0} & \num{+1.020e-2}
+\end{array}
+\right)
+\]
+
+The centre of mass is $[0.22,0,0.96]^T$.
+
+\paragraph{Gripper.} The gripper has a mass of 64g. It is connect to the forearm by a prismatic joint (along the -z-axis), and its inertia matrix is given below:
+
+\[
+I_{Gripper} = 
+\left(
+\begin{array}{ccc}
+\num{+8.451e-3} & \num{0} & \num{0}\\
+\num{0} & \num{+8.434e-3} & \num{0}\\
+\num{0} & \num{0} & \num{+9.635e-5}
+\end{array}
+\right)
+\]
+
+The centre of mass is $[0.32,0,0.88]^T$.
+%\[
+%\left(
+%\begin{array}{ccc}
+%\num{} & \num{} & \num{}\\
+%\num{} & \num{} & \num{}\\
+%\num{} & \num{} & \num{}
+%\end{array}
+%\right)
+%\]
+
+Because the frames of reference of the four links have all the same orientation, the adjoint representation depend only on the translation vector between the frames of reference (The centres of mass above are all relative to the origin of the scene).
+
+$p_{Forearm,Base} = [-0.14, 0, -0.96]^T$
+
+$p_{Arm,Forearm} = [-0.08, 0, 0.05]^T$
+
+$p_{Gripper,Arm} = [-0.1, 0, 0.08]^T$
+
+\chapter{Forward kinematics}
+
+\section{Link frames of reference}
+
+We do not need to calculate all frames to calculate the forward kinematics, only $\{0\}$ and $\{4\}$. Nevertheless, for the dynamics we need all of them, so they are calculated here.
+
+Frames of reference for base (0), link (1-3) and end-effector (4). Notice that we take the frame of reference for the base at the origin instead of its center of mass.
+
+$\{0\} = [0, 0, 0, 0, 0, 0]^T$
+
+$\{1\} = [0.14, 0, 1.01, 0, 0, 0]^T$
+
+$\{2\} = [0.22, 0, 0.96, 0, 0, 0]^T$
+
+$\{3\} = [0.32, 0, 0.88, 0, 0, 0]^T$
+
+$\{4\} = [0.32, 0, 0.735, 0, 0, 0]^T$
+
+
+\section{Configuration of frames with respect to $\{0\}$}
+
+
+\begin{minipage}{0.5\textwidth}
+	\[
+	M_1 = \left(\begin{array}{cccc}
+	1 & 0 & 0 & 0.14\\
+	0 & 1 & 0 & 0\\
+	0 & 0 & 1 & 1.01\\
+	0 & 0 & 0 & 1
+	\end{array}\right)
+	\]
+	
+	\[
+	M_3 = \left(\begin{array}{cccc}
+	1 & 0 & 0 & 0.32\\
+	0 & 1 & 0 & 0\\
+	0 & 0 & 1 & 0.88\\
+	0 & 0 & 0 & 1
+	\end{array}\right)
+	\]
+\end{minipage}
+\begin{minipage}{0.5\textwidth}
+	\[
+	M_2 = \left(\begin{array}{cccc}
+	1 & 0 & 0 & 0.22\\
+	0 & 1 & 0 & 0\\
+	0 & 0 & 1 & 0.96\\
+	0 & 0 & 0 & 1
+	\end{array}\right)
+	\]
+	
+	\[
+	M_4 = \left(\begin{array}{cccc}
+	1 & 0 & 0 & 0.32\\
+	0 & 1 & 0 & 0\\
+	0 & 0 & 1 & 0.735\\
+	0 & 0 & 0 & 1
+	\end{array}\right)
+	\]
+\end{minipage}
+
+\section{Screw axes with respect to $\{0\}$}
+
+$S_1 = [0, 0, 1, 0 ,0, 0]^T$
+
+$S_2 = [0,0,0,1,0,0]^T$
+
+$S_3 = [0,0,0,0,0,-1]^T$
+
+\section{Screw axes in the frame of parent link}
+
+$A_i$ is the screw axis expressed in the link frame $\{i\}$.
+
+$A_1 = [0,0,1,0,0.14,0]^T$
+
+$A_2 = [0,0,0,1,0,0]^T$
+
+$A_3 = [0,0,0,0,0,-1]^T$
+
+\section{Configurations of link frames through a joint}
+
+The control variables $\theta_1$, $\theta_2$, and $\theta_3$ are in $rad/s$, $m/s$, and $m/s$ respectively.
+
+\[
+T_{01}(\theta_1) = \left(\begin{array}{cccc}
+cos(\theta_1) & -sin(\theta_1) & 0 & 0.14 cos(\theta_1)\\
+sin(\theta_1) & cos(\theta_1) & 0 & 0.14 sin(\theta_1)\\
+0 & 0 & 1 & 1.01\\
+0 & 0 & 0 & 1
+\end{array}\right)
+\]
+
+\[
+T_{10}(\theta_1) = \left(\begin{array}{cccc}
+cos(\theta_1) & sin(\theta_1) & 0 & -0.14\\
+-sin(\theta_1) & cos(\theta_1) & 0 & 0\\
+0 & 0 & 1 & -1.01\\
+0 & 0 & 0 & 1
+\end{array}\right)
+\]
+
+\[
+T_{12}(\theta_2) = \left(\begin{array}{cccc}
+1 & 0 & 0 & \theta_2+0.08\\
+0 & 1 & 0 & 0\\
+0 & 0 & 1 & -0.05\\
+0 & 0 & 0 & 1
+\end{array}\right)
+\]
+
+\[
+T_{21}(\theta_2) = \left(\begin{array}{cccc}
+1 & 0 & 0 & -\theta_2-0.08\\
+0 & 1 & 0 & 0\\
+0 & 0 & 1 & 0.05\\
+0 & 0 & 0 & 1
+\end{array}\right)
+\]
+
+\[
+T_{02}(theta_1, \theta_2) = \left(\begin{array}{cccc}
+cos(\theta_1) & -sin(\theta_1) & 0 & (\theta_2+0.22)cos(\theta_1)\\
+sin(\theta_1) & cos(\theta_1) & 0 & (\theta_2+0.22)sin(\theta_1)\\
+0 & 0 & 1 & 0.96\\
+0 & 0 & 0 & 1
+\end{array}\right)
+\]
+
+\[
+T_{23}(\theta_3) = \left(\begin{array}{cccc}
+1 & 0 & 0 & 0.1\\
+0 & 1 & 0 & 0\\
+0 & 0 & 1 & -0.08-\theta_3\\
+0 & 0 & 0 & 1
+\end{array}\right)
+\]
+
+\[
+T_{32}(\theta_3) = \left(\begin{array}{cccc}
+1 & 0 & 0 & -0.1\\
+0 & 1 & 0 & 0\\
+0 & 0 & 1 & 0.08+\theta_3\\
+0 & 0 & 0 & 1
+\end{array}\right)
+\]
+
+\[
+T_{03}(theta_1, \theta_2, \theta_3) = \left(\begin{array}{cccc}
+cos(\theta_1) & -sin(\theta_1) & 0 & (\theta_2+0.32)cos(\theta_1)\\
+sin(\theta_1) & cos(\theta_1) & 0 & (\theta_2+0.32)sin(\theta_1)\\
+0 & 0 & 1 & 0.88-\theta_3\\
+0 & 0 & 0 & 1
+\end{array}\right)
+\]
+
+\[
+T_{34} = \left(\begin{array}{cccc}
+1 & 0 & 0 & 0\\
+0 & 1 & 0 & 0\\
+0 & 0 & 1 & -0.145\\
+0 & 0 & 0 & 1
+\end{array}\right)
+\]
+
+\[
+T_{43} = \left(\begin{array}{cccc}
+1 & 0 & 0 & 0\\
+0 & 1 & 0 & 0\\
+0 & 0 & 1 & 0.145\\
+0 & 0 & 0 & 1
+\end{array}\right)
+\]
+
+\[
+T_{04}(theta_1, \theta_2) = \left(\begin{array}{cccc}
+cos(\theta_1) & -sin(\theta_1) & 0 & (\theta_2+0.32)cos(\theta_1)\\
+sin(\theta_1) & cos(\theta_1) & 0 & (\theta_2+0.32)sin(\theta_1)\\
+0 & 0 & 1 & 0.735-\theta_3\\
+0 & 0 & 0 & 1
+\end{array}\right)
+\]
+
+\section{Result}
+
+The position of the end effector with respect to the origin is given by the configuration 
+$C_{End} = T_{01}T_{12}T_{23}T_{34} = T_{04}$.
+
+\[
+C_{End}(\theta_1,\theta_2,\theta_3) = \left(\begin{array}{cccc}
+cos(\theta_1) & -sin(\theta_1) & 0 & (\theta_2+0.32)cos(\theta_1)\\
+sin(\theta_1) & cos(\theta_1) & 0 & (\theta_2+0.32)sin(\theta_1)\\
+0 & 0 & 1 & 0.735-\theta_3\\
+0 & 0 & 0 & 1
+\end{array}\right)
+\]
+
+The position $(x,y,z)$ of the end effector (with respect to the position its own frame of reference) is given by the set of equations:
+
+\begin{align}
+x &= cos(\theta_1)(\theta_2+0.32)\\
+y &= sin(\theta_1)(\theta_2+0.32)\\
+z &= 0.735-\theta_3
+\end{align}
+
+\section{Inverse Kinematics*}
+
+The equations above can be solved for $(\theta_1, \theta_2, \theta_3)$ to obtain the inverse kinematics.
+The joint positions $(\theta_1, \theta_2, and \theta_3)$ necessary to move the end effector to the position $(x,y,z)$ are given by the equations below (with some loss of information because of $x^2+y^2$):
+
+\begin{align}
+\theta_1 &= acos\left(\frac{x}{\sqrt{x^2+y^2}}\right)\\
+\theta_2 &= \sqrt{x^2+y^2}-0.32\\
+\theta_3 &= 0.735-z
+\end{align}
+
+The equations for $x$ and $y$ are similar to the equation for converting from polar coordinates to cartesian coordinates. We can adopt the standard approach for the inverse, where the special function $atan2$ is used to define $\theta_1$. In this case, the equations are as follows:
+
+\begin{align}
+\theta_1 &= atan2(y,x)\\
+\theta_2 &= \sqrt{x^2+y^2}-0.32\\
+\theta_3 &= 0.735-z
+\end{align}
+
+The function $atan2(y,x)$ is shown below:
+
+\[
+atan2(y,x) = \left\{
+\begin{array}{ll}
+arctan(\frac{y}{x}) & \textrm{if }x>0\\
+arctan(\frac{y}{x}) + \pi & \textrm{if }x<0 \land y \ge 0\\
+arctan(\frac{y}{x}) - \pi & \textrm{if }x<0 \land y < 0\\
+\frac{\pi}{2} & \textrm{if } x = 0 \land y > 0\\
+-\frac{\pi}{2} & \textrm{if } x = 0 \land y < 0\\
+undefined & \textrm{if } x = 0 \land y = 0
+\end{array}\right.
+\]
+
+
+\chapter{Dynamics}
+
+\section{Initial definitions}
+\begin{align*}
+&\mathfrak{g} = [0,0,g]^T \textrm{ with } g < 0\\
+&\mathcal{V}_0 = [0,0,0,0,0,0]^T\\
+&\dot{\mathcal{V}}_0 = [0,0,0,\mathfrak{g}^T]^T
+\end{align*}
+
+\section{Spacial inertia matrices}
+
+\[
+G_1 = 
+\left(
+\begin{array}{ccccccc}
+\num{+6.667e-5} & \num{0} & \num{0} & 0 & 0 & 0\\
+\num{0} & \num{+7.533e-3} & \num{0} & 0 & 0 & 0\\
+\num{0} & \num{0} & \num{+7.533e-3} & 0 & 0 & 0\\
+0 & 0 & 0 & 1.2 & 0 & 0\\
+0 & 0 & 0 & 0 & 1.2 & 0\\
+0 & 0 & 0 & 0 & 0 & 1.2
+\end{array}
+\right)
+\]
+
+
+\[
+G_2 = 
+\left(
+\begin{array}{ccccccc}
+\num{+8.700e-3} & \num{0} & \num{0} & 0 & 0 & 0\\
+\num{0} & \num{+1.883e-2} & \num{0} & 0 & 0 & 0\\
+\num{0} & \num{0} & \num{+1.020e-2} & 0 & 0 & 0\\
+0 & 0 & 0 & 0.720 & 0 & 0\\
+0 & 0 & 0 & 0 & 0.720 & 0\\
+0 & 0 & 0 & 0 & 0 & 0.720
+\end{array}
+\right)
+\]
+
+\[
+G_3 = 
+\left(
+\begin{array}{cccccc}
+\num{+8.451e-3} & \num{0} & \num{0} & 0 & 0 & 0\\
+\num{0} & \num{+8.434e-3} & \num{0} & 0 & 0 & 0\\
+\num{0} & \num{0} & \num{+9.635e-5} & 0 & 0 & 0\\
+0 & 0 & 0 & 0.064 & 0 & 0\\
+0 & 0 & 0 & 0 & 0.064 & 0\\
+0 & 0 & 0 & 0 & 0 & 0.064
+\end{array}
+\right)
+\]
+
+\section{Forward iterations}
+
+\paragraph{Step i = 1}
+
+\begin{align*}
+\mathcal{V}_1 &= Ad_{T_{10}}\mathcal{V}_0 + A_1\dot{\theta}_1
+= Ad_{T_10}0 + A1\dot{\theta}_1
+= [0,0,1,0,0.14,0]^T\dot{\theta}_1\\
+&= \underline{\myvec{0\\0\\\dot{\theta}_1\\0\\0.14\dot{\theta}_1\\0}}
+\end{align*}         
+
+\[
+Ad_{T_{10}} = \left(\begin{array}{cccccc}
+cos(\theta_1) & sin(\theta_1) & 0 & 0 & 0 & 0\\
+-sin(\theta_1) & cos(\theta_1) & 0 & 0 & 0 & 0\\
+0 & 0 & 1 & 0 & 0 & 0\\
+-1.01sin(\theta_1) & 1.01cos(\theta_1) & 0 & cos(\theta_1) & sin(\theta_1) & 0\\
+1.01cos(\theta_1) & 1.01sin(\theta_1) & 0 & -sin(\theta_1) & cos(\theta_1) & 0.14\\
+0.14sin(\theta_1) & -0.14cos(\theta_1) & 0 & 0 & 0 & 1
+\end{array}
+\right)
+\]
+
+\begin{align*}
+\dot{\mathcal{V}}_1 &= Ad_{T_{10}}\dot{\mathcal{V}}_0 + ad_{\mathcal{V}_1}(\mathcal{A}_1)\dot{\theta}_1+\mathcal{A}_1\ddot{\theta}_1
+= Ad_{T_{10}}\mathfrak{g} + 0\dot{\theta}_1+\mathcal{A}_1\ddot{\theta}_1\\
+&= [0,0,0,0,0.14g,g]+[0,0,\ddot{\theta}_1,0,0.14\ddot{\theta}_1,0]^T\\
+&= \underline{\myvec{0\\0\\\ddot{\theta}_1\\0\\0.14(g+\ddot{\theta}_1)\\ g}}
+\end{align*}    
+
+\paragraph{Step i = 2}
+
+
+\[
+Ad_{T_{21}} = \left(\begin{array}{cccccc}
+1 & 0 & 0 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 & 0 \\
+0 & -0.05 & 0 & 1 & 0 & 0 \\
+0.05 & 0 & \theta_2+0.08 & 0 & 1 & 0 \\
+0 & -\theta_2-0.08 & 0 & 0 & 0 & 1
+\end{array}\right)
+\]
+
+\begin{align*}
+\mathcal{V}_2 &= Ad_{T_{21}}\mathcal{V}_1 + A_2\dot{\theta}_2\\
+& = \left(\begin{array}{cccccc}
+1 & 0 & 0 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 & 0 \\
+0 & -0.05 & 0 & 1 & 0 & 0 \\
+0.05 & 0 & \theta_2+0.08 & 0 & 1 & 0 \\
+0 & -\theta_2-0.08 & 0 & 0 & 0 & 1
+\end{array}\right)\left(\begin{array}{c}
+0\\ 0\\ \dot{\theta}_1\\ 0\\ 0.14\dot{\theta}_1\\ 0
+\end{array}\right)+
+\left(\begin{array}{c}
+0\\0\\0\\1\\0\\0
+\end{array}\right)\dot{\theta}_2\\
+& = \underline{\myvec{0 \\ 0 \\ \dot{\theta}_1\\ \dot{\theta}_2\\ \dot{\theta}_1(\theta_2+0.22)\\ 0}}
+\end{align*}         
+
+\newcommand{\vdot}[1]{\dot{\mathcal{V}}_{#1}}
+\newcommand{\tdot}[1]{\dot{\theta}_{#1}}
+\newcommand{\tddot}[1]{\ddot{\theta}_{#1}}
+\begin{align*}
+\vdot{2} &= Ad_{T_{21}}\vdot{1} + ad_{\mathcal{V}_2}(\mathcal{A}_2)\dot{\theta}_2+\mathcal{A}_2\ddot{\theta}_2\\
+& = \left(\begin{array}{cccccc}
+1 & 0 & 0 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 & 0 \\
+0 & -0.05 & 0 & 1 & 0 & 0 \\
+0.05 & 0 & \theta_2+0.08 & 0 & 1 & 0 \\
+0 & -\theta_2-0.08 & 0 & 0 & 0 & 1
+\end{array}\right)
+\myvec{0\\0\\\tddot{1}\\0\\0.14(g+\tddot{1})\\g}\\
+&+
+\left(\begin{array}{cccccc}
+	0 & -\tdot{1} & 0 & 0 & 0 & 0 \\
+	\tdot{1} & 0 & 0 & 0 & 0 & 0 \\
+	0 & 0 & 0 & 0 & 0 & 0 \\
+	0 & 0 & \tdot{1}(\theta_2+0.22) & 0 & -\tdot{1} & 0 \\
+	0 & 0 & -\tdot{2} & \tdot{1} & 0 & 0 \\
+	-\tdot{1}(\theta_2+0.22) & \tdot{2} & 0 & 0 & 0 & 0
+\end{array}\right)
+\myvec{0\\0\\0\\1\\0\\0}\tdot{2}+\myvec{0\\0\\0\\\tddot{2}\\0\\0}\\
+&=\myvec{0\\0\\\tddot{1}\\0\\\tddot{1}(\theta_2+0.08)+0.14(g+\tddot{1})\\g}+
+\myvec{0\\0\\0\\0\\\tdot{1}\\0}\tdot{2}+\myvec{0\\0\\0\\\tddot{2}\\0\\0}\\
+&= \underline{\myvec{0\\0\\\tddot{1}\\\tddot{2}\\\tddot{1}(\theta_2+0.22)+0.14g+\tdot{1}\tdot{2}\\g}}
+\end{align*}    
+
+\paragraph{Step i = 3}
+
+\[
+Ad_{T_{32}} = \left(\begin{array}{cccccc}
+1 & 0 & 0 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 & 0 \\
+0 & -0.08-\theta_3 & 0 & 1 & 0 & 0 \\
+0.08+\theta_3 & 0 & 0.1 & 0 & 1 & 0 \\
+0 & -0.1 & 0 & 0 & 0 & 1
+\end{array}\right)
+\]
+
+\begin{align*}
+\mathcal{V}_3 &= Ad_{T_{32}}\mathcal{V}_2 + A_3\dot{\theta}_3\\
+& = \left(\begin{array}{cccccc}
+1 & 0 & 0 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 & 0 \\
+0 & -0.08-\theta_3 & 0 & 1 & 0 & 0 \\
+0.08+\theta_3 & 0 & 0.1 & 0 & 1 & 0 \\
+0 & -0.1 & 0 & 0 & 0 & 1
+\end{array}\right)
+\myvec{0 \\ 0 \\ \dot{\theta}_1\\ \dot{\theta}_2\\ \dot{\theta}_1(\theta_2+0.22)\\ 0}+
+\myvec{0\\ 0\\ 0\\ 0\\ 0\\ -1}\tdot{3}\\
+&= \underline{\myvec{0\\ 0\\ \tdot{1}\\\tdot{2}\\\dot{\theta}_1(\theta_2+0.32)\\-\tdot{3}}}
+\end{align*}         
+
+\begin{align*}
+\vdot{3} &= Ad_{T_{32}}\vdot{2} + ad_{\mathcal{V}_3}(\mathcal{A}_3)\dot{\theta}_3+\mathcal{A}_3\ddot{\theta}_3\\
+& = \left(\begin{array}{cccccc}
+1 & 0 & 0 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 & 0 \\
+0 & -0.08-\theta_3 & 0 & 1 & 0 & 0 \\
+0.08+\theta_3 & 0 & 0.1 & 0 & 1 & 0 \\
+0 & -0.1 & 0 & 0 & 0 & 1
+\end{array}\right)
+\myvec{0\\0\\\tddot{1}\\\tddot{2}\\\tddot{1}(\theta_2+0.22)+0.14g+\tdot{1}\tdot{2}\\g}\\
+&+
+0\tdot{3}+\myvec{0\\0\\0\\0\\0\\-\tddot{3}}\\
+&= \underline{\myvec{0\\0\\\tddot{1}\\\tddot{2}\\\tddot{1}(\theta_2+0.32)+0.14g+\tdot{1}\tdot{2}\\g-\tddot{3}}}
+\end{align*}    
+
+\paragraph{End effector (4)}
+
+Since end effector is attached to link 3, $\tddot{4} = 0$ and $\tdot{4} = 0$.
+
+\[
+Ad_{T_{43}} = \left(\begin{array}{cccccc}
+1 & 0 & 0 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 & 0 \\
+0 & -0.145 & 0 & 1 & 0 & 0 \\
+0.145 & 0 & 0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 0 & 0 & 1
+\end{array}\right)
+\]
+
+\begin{align*}
+\mathcal{V}_4 &= Ad_{T_{43}}\mathcal{V}_3 + A_4\dot{\theta}_4 = Ad_{T_{43}}\mathcal{V}_3\\
+& = \left(\begin{array}{cccccc}
+1 & 0 & 0 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 & 0 \\
+0 & -0.145 & 0 & 1 & 0 & 0 \\
+0.145 & 0 & 0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 0 & 0 & 1
+\end{array}\right)
+\myvec{0\\ 0\\ \tdot{1}\\\tdot{2}\\\dot{\theta}_1(\theta_2+0.32)\\-\tdot{3}}\\
+&= \underline{\myvec{0\\ 0\\ \tdot{1}\\\tdot{2}\\\dot{\theta}_1(\theta_2+0.32)\\-\tdot{3}}}
+\end{align*}         
+
+\begin{align*}
+\vdot{4} &= Ad_{T_{43}}\vdot{3} + ad_{\mathcal{V}_4}(\mathcal{A}_3)\dot{\theta}_4+\mathcal{A}_4\ddot{\theta}_4 = Ad_{T_{43}}\vdot{3}\\
+& = \left(\begin{array}{cccccc}
+1 & 0 & 0 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 & 0 \\
+0 & -0.145 & 0 & 1 & 0 & 0 \\
+0.145 & 0 & 0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 0 & 0 & 1
+\end{array}\right)
+\myvec{0\\0\\\tddot{1}\\\tddot{2}\\\tddot{1}(\theta_2+0.32)+0.14g+\tdot{1}\tdot{2}\\g-\tddot{3}}\\
+&= \underline{\myvec{0\\0\\\tddot{1}\\\tddot{2}\\\tddot{1}(\theta_2+0.32)+0.14g+\tdot{1}\tdot{2}\\g-\tddot{3}}}
+\end{align*}
+
+\section{Backward iteration}
+
+\begin{align*}
+&\mathcal{F}_i = Ad_{T_{i+1,i}}^T(\mathcal{F}_{i+1})+\mathcal{G}_i\dot{\mathcal{V}}_i-ad_{\mathcal{V}_i}^T(\mathcal{G}_i\mathcal{V}_i)\\
+&\tau_i = \mathcal{F}_i^T\mathcal{A}_i
+\end{align*}
+
+\paragraph{Step 3}
+
+\begin{align*}
+\mathcal{F}_3 &= Ad_{T_{4,3}}^T(\mathcal{F}_{4})+\mathcal{G}_3\dot{\mathcal{V}}_3-ad_{\mathcal{V}_3}^T(\mathcal{G}_3\mathcal{V}_3)\\
+&= Ad_{T_{4,3}}^T\myvec{0\\0\\0\\0\\0\\0}\\
+&+\left(
+\begin{array}{cccccc}
+\num{+8.45e-3} & \num{0} & \num{0} & 0 & 0 & 0\\
+\num{0} & \num{+8.43e-3} & \num{0} & 0 & 0 & 0\\
+\num{0} & \num{0} & \num{+9.63e-5} & 0 & 0 & 0\\
+0 & 0 & 0 & 0.064 & 0 & 0\\
+0 & 0 & 0 & 0 & 0.064 & 0\\
+0 & 0 & 0 & 0 & 0 & 0.064
+\end{array}
+\right)\myvec{0\\0\\\tddot{1}\\\tddot{2}\\\tddot{1}(\theta_2+0.32)+0.14g+\tdot{1}\tdot{2}\\g-\tddot{3}}\\
+&-[ad_{\mathcal{V}_3}]^T\left(
+\begin{array}{cccccc}
+\num{+8.45e-3} & \num{0} & \num{0} & 0 & 0 & 0\\
+\num{0} & \num{+8.43e-3} & \num{0} & 0 & 0 & 0\\
+\num{0} & \num{0} & \num{+9.63e-5} & 0 & 0 & 0\\
+0 & 0 & 0 & 0.064 & 0 & 0\\
+0 & 0 & 0 & 0 & 0.064 & 0\\
+0 & 0 & 0 & 0 & 0 & 0.064
+\end{array}
+\right)\myvec{0\\ 0\\ \tdot{1}\\\tdot{2}\\\dot{\theta}_1(\theta_2+0.32)\\-\tdot{3}}\\
+&=
+\myvec{0\\0\\\num{+9.63e-5}\tddot{1}\\0.064\tddot{2}\\0.064(\tddot{1}(\theta_2+0.32)+0.14g+\tdot{1}\tdot{2})\\0.064(g-\tddot{3})}
+- [ad_{\mathcal{V}_3}]^T\myvec{0\\ 0\\ \num{+9.63e-5}\tdot{1}\\0.064\tdot{2}\\0.064\dot{\theta}_1(\theta_2+0.32)\\-0.064\tdot{3}}\\
+&= \myvec{0\\0\\\num{+9.63e-5}\tddot{1}\\0.064\tddot{2}\\0.064(\tddot{1}(\theta_2+0.32)+0.14g+\tdot{1}\tdot{2})\\0.064(g-\tddot{3})}
+- \myvec{0\\0\\0\\0.064\tdot{1}\tdot{1}(\theta_2+0.32)\\-0.064\tdot{2}\tdot{1}\\0}\\
+&= \underline{\myvec{0\\0\\\num{+9.63e-5}\tddot{1}\\0.064(\tddot{2}-\tdot{1}\tdot{1}(\theta_2+0.32))\\0.064(\tddot{1}(\theta_2+0.32)+0.14g+2\tdot{1}\tdot{2})\\0.064(g-\tddot{3})}}
+\end{align*}
+
+\begin{align*}
+\tau_3 &= \mathcal{F}_3^T\mathcal{A}_3\\
+&=\myvec{0\\0\\\num{+9.63e-5}\tddot{1}\\0.064(\tddot{2}-\tdot{1}\tdot{1}(\theta_2+0.32))\\0.064(\tddot{1}(\theta_2+0.32)+0.14g+2\tdot{1}\tdot{2})\\0.064(g-\tddot{3})}^T\myvec{0\\0\\0\\0\\0\\-1}\\
+&= 0.064(\tddot{3}-g)
+\end{align*}
+
+\paragraph{Step 2}
+
+\begin{align*}
+\mathcal{F}_2 &= Ad_{T_{3,2}}^T(\mathcal{F}_{3})+\mathcal{G}_2\dot{\mathcal{V}}_2-ad_{\mathcal{V}_2}^T(\mathcal{G}_2\mathcal{V}_2)\\
+&=\left(\begin{array}{cccccc}
+1 & 0 & 0 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 & 0 \\
+0 & -0.08-\theta_3 & 0 & 1 & 0 & 0 \\
+0.08+\theta_3 & 0 & 0.1 & 0 & 1 & 0 \\
+0 & -0.1 & 0 & 0 & 0 & 1
+\end{array}\right)^T\mathcal{F}_{3}\\
+&+\left(
+\begin{array}{ccccccc}
+\num{+8.7e-3} & \num{0} & \num{0} & 0 & 0 & 0\\
+\num{0} & \num{+1.9e-2} & \num{0} & 0 & 0 & 0\\
+\num{0} & \num{0} & \num{+1e-2} & 0 & 0 & 0\\
+0 & 0 & 0 & 0.720 & 0 & 0\\
+0 & 0 & 0 & 0 & 0.720 & 0\\
+0 & 0 & 0 & 0 & 0 & 0.720
+\end{array}
+\right)\myvec{0\\0\\\tddot{1}\\\tddot{2}\\\tddot{1}(\theta_2+0.22)+0.14g+\tdot{1}\tdot{2}\\g}\\
+&-[ad_{\mathcal{V}_2}]^T\left(
+\begin{array}{ccccccc}
+\num{+8.7e-3} & \num{0} & \num{0} & 0 & 0 & 0\\
+\num{0} & \num{+1.9e-2} & \num{0} & 0 & 0 & 0\\
+\num{0} & \num{0} & \num{+1e-2} & 0 & 0 & 0\\
+0 & 0 & 0 & 0.720 & 0 & 0\\
+0 & 0 & 0 & 0 & 0.720 & 0\\
+0 & 0 & 0 & 0 & 0 & 0.720
+\end{array}\right)\myvec{0 \\ 0 \\ \dot{\theta}_1\\ \dot{\theta}_2\\ \dot{\theta}_1(\theta_2+0.22)\\ 0}\\
+&=
+\left(\begin{array}{cccccc}
+1 & 0 & 0 & 0 & 0.08+\theta_3 & 0 \\
+0 & 1 & 0 & -0.08-\theta_3 & 0 & -0.1 \\
+0 & 0 & 1 & 0 & 0.1 & 0 \\
+0 & 0 & 0 & 1 & 0 & 0 \\
+0 & 0 & 0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 0 & 0 & 1
+\end{array}\right)\myvec{0\\0\\\num{+9.63e-5}\tddot{1}\\0.064(\tddot{2}-\tdot{1}\tdot{1}(\theta_2+0.32))\\0.064(\tddot{1}(\theta_2+0.32)+0.14g+2\tdot{1}\tdot{2})\\0.064(g-\tddot{3})}\\
+&+\myvec{0\\0\\\num{+1e-2}\tddot{1}\\0.72\tddot{2}\\0.72(\tddot{1}(\theta_2+0.22)+0.14g+\tdot{1}\tdot{2})\\0.72g}-[ad_{\mathcal{V}_2}]^T\myvec{0 \\ 0 \\ \num{+1e-2}\dot{\theta}_1\\ 0.72\dot{\theta}_2\\ 0.72\dot{\theta}_1(\theta_2+0.22)\\ 0}
+\end{align*}
+\begin{align*}
+&=\myvec{0.064(0.08+\theta_3)(\tddot{1}(\theta_2+0.32)+0.14g+2\tdot{1}\tdot{2})  \\
+	-0.064(0.08+\theta_3)(\tddot{2}-\tdot{1}\tdot{1}(\theta_2+0.32))-0.0064(g-\tddot{3})\\
+	\num{+9.63e-5}\tddot{1}+0.0064(\tddot{1}(\theta_2+0.32)+0.14g+2\tdot{1}\tdot{2})\\
+	0.064(\tddot{2}-\tdot{1}\tdot{1}(\theta_2+0.32))\\
+	0.064(\tddot{1}(\theta_2+0.32)+0.14g+2\tdot{1}\tdot{2})\\
+	0.064(g-\tddot{3})}\\
+&+\myvec{0\\0\\\num{+1e-2}\tddot{1}\\0.72\tddot{2}\\0.72(\tddot{1}(\theta_2+0.22)+0.14g+\tdot{1}\tdot{2})\\0.72g}
+-\myvec{0 \\ 0 \\ 0\\ 0.72\tdot{1}\tdot{1}(\theta_2+0.22)\\ -0.72\tdot{1}\tdot{2}\\ 0}\\
+&=\underline{\myvec{0.064(0.08+\theta_3)(\tddot{1}(\theta_2+0.32)+0.14g+2\tdot{1}\tdot{2})  \\
+	-0.064(0.08+\theta_3)(\tddot{2}-\tdot{1}\tdot{1}(\theta_2+0.32))-0.0064(g-\tddot{3})\\	
+	\num{0.64e-2}(1.897\tddot{1}+\tddot{1}\theta_2+0.14g+2\tdot{1}\tdot{2})\\
+	0.784(\tddot{2}-\tdot{1}^2\theta_2-0.2282\tdot{1}^2)\\
+	0.784(\tddot{1}\theta_2+0.2282\tddot{1}+0.14g+0.1633\tdot{1}\tdot{2})\\
+	0.784g-0.064\tddot{3}}}\\
+\end{align*}
+
+\begin{align*}
+\tau_2 &= \mathcal{F}_2^T\mathcal{A}_2\\
+& = \myvec{0.064(0.08+\theta_3)(\tddot{1}(\theta_2+0.32)+0.14g+2\tdot{1}\tdot{2})  \\
+	-0.064(0.08+\theta_3)(\tddot{2}-\tdot{1}\tdot{1}(\theta_2+0.32))-0.0064(g-\tddot{3})\\
+	\num{+9.63e-5}\tddot{1}+0.0064(\tddot{1}(\theta_2+0.32)+0.14g+2\tdot{1}\tdot{2})+\num{+1e-2}\tddot{1}\\
+	0.064(\tddot{2}-\tdot{1}\tdot{1}(\theta_2+0.32))+0.72\tddot{2}-0.72\tdot{1}\tdot{1}(\theta_2+0.22)\\
+	0.784(\tddot{1}\theta_2+0.2282\tddot{1}+0.14g+0.1633\tdot{1}\tdot{2})\\
+	0.784g-0.064\tddot{3}}^T
+\myvec{0\\0\\0\\1\\0\\0}\\
+& = {0.064(\tddot{2}-\tdot{1}\tdot{1}(\theta_2+0.32))+0.72\tddot{2}-0.72\tdot{1}\tdot{1}(\theta_2+0.22)}\\
+& = \underline{0.784(\tddot{2}-\tdot{1}^2\theta_2-0.2282\tdot{1}^2)}
+\end{align*}
+
+\paragraph{Step 1}
+
+\begin{align*}
+\mathcal{F}_1 &= Ad_{T_{2,1}}^T(\mathcal{F}_{2})+\mathcal{G}_1\dot{\mathcal{V}}_1-ad_{\mathcal{V}_1}^T(\mathcal{G}_1\mathcal{V}_1)\\
+&= \left(\begin{array}{cccccc}
+1 & 0 & 0 & 0 & 0.05 & 0 \\
+0 & 1 & 0 & -0.05 & 0 & -\theta_2-0.08 \\
+0 & 0 & 1 & 0 & \theta_2+0.08 & 0 \\
+0 & 0 & 0 & 1 & 0 & 0 \\
+0 & 0 & 0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 0 & 0 & 1
+\end{array}\right)\myvec{0.064(0.08+\theta_3)(\tddot{1}(\theta_2+0.32)+0.14g+2\tdot{1}\tdot{2})  \\
+	-0.064(0.08+\theta_3)(\tddot{2}-\tdot{1}\tdot{1}(\theta_2+0.32))-0.0064(g-\tddot{3})\\	
+	\num{0.64e-2}(1.897\tddot{1}+\tddot{1}\theta_2+0.14g+2\tdot{1}\tdot{2})\\
+	0.784(\tddot{2}-\tdot{1}^2\theta_2-0.2282\tdot{1}^2)\\
+	0.784(\tddot{1}\theta_2+0.2282\tddot{1}+0.14g+0.1633\tdot{1}\tdot{2})\\
+	0.784g-0.064\tddot{3}}\\
+&+
+\left(
+\begin{array}{ccccccc}
+\num{+6.667e-5} & \num{0} & \num{0} & 0 & 0 & 0\\
+\num{0} & \num{+7.533e-3} & \num{0} & 0 & 0 & 0\\
+\num{0} & \num{0} & \num{+7.533e-3} & 0 & 0 & 0\\
+0 & 0 & 0 & 1.2 & 0 & 0\\
+0 & 0 & 0 & 0 & 1.2 & 0\\
+0 & 0 & 0 & 0 & 0 & 1.2
+\end{array}
+\right)\myvec{0\\0\\\ddot{\theta}_1\\0\\0.14(g+\ddot{\theta}_1)\\ g}-ad_{\mathcal{V}_1}^T(\mathcal{G}_1\mathcal{V}_1)\\
+&= \left(\begin{array}{cccccc}
+1 & 0 & 0 & 0 & 0.05 & 0 \\
+0 & 1 & 0 & -0.05 & 0 & -\theta_2-0.08 \\
+0 & 0 & 1 & 0 & \theta_2+0.08 & 0 \\
+\end{array}\right)
+\\
+&
+\myvec{0.064(0.08+\theta_3)(\tddot{1}(\theta_2+0.32)+0.14g+2\tdot{1}\tdot{2}) +	0.0392(\tddot{1}\theta_2+0.2282\tddot{1}+0.14g+0.1633\tdot{1}\tdot{2}) \\
+	\frac{\tdot{1}^2}{100}(1.06+4.43\theta_2+2.25\theta_3+6.4\theta_2\theta_3)
+	-\frac{\tddot{2}}{100}(4.43+6.4\theta_3)
+	+\frac{\tddot{3}}{100}(1.15+6.4\theta_2)
+	-\frac{g}{10}(0.691+7.84\theta_2)
+	\\	
+	\num{0.64e-2}(1.897\tddot{1}+\tddot{1}\theta_2+0.14g+2\tdot{1}\tdot{2})\\
+	0.784(\tddot{2}-\tdot{1}^2\theta_2-0.2282\tdot{1}^2)\\
+	0.784(\tddot{1}\theta_2+0.2282\tddot{1}+0.14g+0.1633\tdot{1}\tdot{2})\\
+	0.784g-0.064\tddot{3}}\\
+&+
+\myvec{0\\
+	0\\
+	\num{+7.533e-3}\ddot{\theta}_1\\
+	0\\
+	0.168(g+\ddot{\theta}_1)\\
+	1.2g}
+-\myvec{0\\0\\0\\0.168\tdot{1}^2\\0\\0}\\
+&=
+\myvec{0.064(0.08+\theta_3)(\tddot{1}(\theta_2+0.32)+0.14g+2\tdot{1}\tdot{2}) +	0.0392(\tddot{1}\theta_2+0.2282\tddot{1}+0.14g+0.1633\tdot{1}\tdot{2}) \\
+	\frac{\tdot{1}^2}{100}(1.06+4.43\theta_2+2.25\theta_3+6.4\theta_2\theta_3)
+	+0.75\frac{\ddot{\theta}_1}{100}
+	-\frac{\tddot{2}}{100}(4.43+6.4\theta_3)
+	+\frac{\tddot{3}}{100}(1.15+6.4\theta_2)
+	-\frac{g}{10}(0.69+7.84\theta_2)
+	\\	
+	\num{0.64e-2}(1.897\tddot{1}+\tddot{1}\theta_2+0.14g+2\tdot{1}\tdot{2})\\
+	0.784(\tddot{2}-\tdot{1}^2\theta_2-0.2282\tdot{1}^2)-0.168\tdot{1}^2\\
+	0.784(\tddot{1}\theta_2+0.4425\tddot{1}+0.3543g+0.1633\tdot{1}\tdot{2})\\
+	1.984g-0.064\tddot{3}}\\
+\end{align*}
+
+\begin{align*}
+\tau_1 &= \mathcal{F}_1^T\mathcal{A}_1 = \mathcal{F}_1^T\myvec{0\\0\\1\\0\\0.14\\0}\\
+&= 0.0064(1.897\tddot{1}+\tddot{1}\theta_2+0.14g+2\tdot{1}\tdot{2})+0.1098(\tddot{1}\theta_2+0.4425\tddot{1}+0.3543g+0.1633\tdot{1}\tdot{2})\\
+&= \tddot{1}(0.0607+0.1162\theta_2)+0.0398g+0.0307\tdot{1}\tdot{2}
+\end{align*}
+
+
+\section{Results}
+
+From the forward kinematics, we know that the position $(x,y,z)$ of the end effector depends on $(\theta_1,\theta_2,\theta_3)$, and from the dynamic equations, we can formulate the following system of equations:
+
+\begin{align*}
+x &= (\theta_2+0.32)cos(\theta_1)\\
+y &= (\theta_2+0.32)sin(\theta_1)\\
+z &= 0.735-\theta_3\\
+\tddot{1} &= \frac{\tau_1-0.0398g-0.0307\tdot{1}\tdot{2}}{0.0607+0.1162\theta_2}\\
+\tddot{2} &= 1.2755\tau_2 +\tdot{1}^2(\theta_2+0.2282)\\
+\tddot{3} &= 15.625\tau_3+g
+\end{align*}
+
+Converting it into a systems of first order differential algebraic equations we obtain:
+
+\begin{align}
+x &= (\theta_2+0.32)cos(\theta_1)\\
+y &= (\theta_2+0.32)sin(\theta_1)\\
+z &= 0.735-\theta_3\\
+\dot{v}_1 &= \frac{\tau_1-0.0398g-0.0307v_1v_2}{0.0607+0.1162\theta_2}\\
+\tdot{1} &= v_1\\
+\dot{v}_2 &= 1.2755\tau_2 +v_1^2(\theta_2+0.2282)\\
+\tdot{2} &= v_2\\
+\dot{v}_3 &= 15.625\tau_3+g\\
+\tdot{3} &= v_3
+\end{align}
+
+Given the joints' initial positions $(s_i)$ and velocities ($v_i$) and the joints' forces-torques ($\tau_i$), we can solve the system of equations to calculate the position $(x,y,z)$ of the end effector at time $t$. Alternatively, we can solve the system of differential equations consisting of 3.4-3.9 to obtain the joint positions $(\theta_1,\theta_2,\theta_3)$ at time $t$ and use the forward kinematic equations (3.1-3.3) to calculate the $(x,y,z)$ position of the end effector.
+
+%\left(\begin{array}{cccccc}
+%	0 & 0 & 0 & 0 & 0 & 0 \\
+%	0 & 0 & 0 & 0 & 0 & 0 \\
+%	0 & 0 & 0 & 0 & 0 & 0 \\
+%	0 & 0 & 0 & 0 & 0 & 0 \\
+%	0 & 0 & 0 & 0 & 0 & 0 \\
+%	0 & 0 & 0 & 0 & 0 & 0
+%\end{array}\right)
+
+\end{document}

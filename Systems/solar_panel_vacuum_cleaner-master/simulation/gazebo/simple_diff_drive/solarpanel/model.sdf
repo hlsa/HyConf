@@ -1,0 +1,209 @@
+<?xml version='1.0'?>
+<sdf version='1.7'>    
+    <model name="solarpanel">
+      <static>true</static>
+      <!-- inclined plane -->
+      <!-- <pose>0 0 0.6 0.26 0 0</pose> -->
+      <!-- flat plane -->
+      <pose>0 0 0.6 0 0 0</pose>
+      <link name="charging_base">
+        <pose>-0.45 -0.35 0 0 0 0</pose>
+         <collision name="panel_collision">
+            <surface>
+            <contact>
+              <collide_bitmask>65535</collide_bitmask>
+              <ode/>
+            </contact>
+            <friction>
+              <ode>
+                <mu>100</mu>
+                <mu2>100</mu2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <geometry>
+            <box>
+              <size>0.1 0.1 0.01</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="panel_visual">
+          <geometry>
+            <box>
+              <size>0.1 0.1 0.01</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+      <link name="panel1">
+        <collision name="panel_collision">
+                    <surface>
+            <contact>
+              <collide_bitmask>65535</collide_bitmask>
+              <ode/>
+            </contact>
+            <friction>
+              <ode>
+                <mu>100</mu>
+                <mu2>100</mu2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <geometry>
+            <box>
+              <size>1 0.6 0.01</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="panel_visual">
+          <geometry>
+            <box>
+              <size>1 0.6 0.01</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+      <link name="bridge1">
+      <pose>0.60 -0.2 0 0 0 0</pose>
+         <collision name="panel_collision">
+            <surface>
+            <contact>
+              <collide_bitmask>65535</collide_bitmask>
+              <ode/>
+            </contact>
+            <friction>
+              <ode>
+                <mu>100</mu>
+                <mu2>100</mu2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <geometry>
+            <box>
+              <size>0.2 0.2 0.01</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="panel_visual">
+          <geometry>
+            <box>
+              <size>0.2 0.2 0.01</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+
+      <link name="panel2">
+        <pose>1.2 0 0 0 0 0</pose>
+        <collision name="panel_collision">
+                    <surface>
+            <contact>
+              <collide_bitmask>65535</collide_bitmask>
+              <ode/>
+            </contact>
+            <friction>
+              <ode>
+                <mu>100</mu>
+                <mu2>100</mu2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <geometry>
+            <box>
+              <size>1 0.6 0.01</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="panel_visual">
+          <geometry>
+            <box>
+              <size>1 0.6 0.01</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+      <link name="bridge2">
+      <pose>1.8 -0.2 0 0 0 0</pose>
+         <collision name="panel_collision">
+            <surface>
+            <contact>
+              <collide_bitmask>65535</collide_bitmask>
+              <ode/>
+            </contact>
+            <friction>
+              <ode>
+                <mu>100</mu>
+                <mu2>100</mu2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <geometry>
+            <box>
+              <size>0.2 0.2 0.01</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="panel_visual">
+          <geometry>
+            <box>
+              <size>0.2 0.2 0.01</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+
+      <link name="panel3">
+        <pose>2.4 0 0 0 0 0</pose>
+        <collision name="panel_collision">
+                    <surface>
+            <contact>
+              <collide_bitmask>65535</collide_bitmask>
+              <ode/>
+            </contact>
+            <friction>
+              <ode>
+                <mu>100</mu>
+                <mu2>100</mu2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <geometry>
+            <box>
+              <size>1 0.6 0.01</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="panel_visual">
+          <geometry>
+            <box>
+              <size>1 0.6 0.01</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+</sdf>
